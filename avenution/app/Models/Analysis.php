@@ -23,14 +23,19 @@ class Analysis extends Model
         'activity_level',
         'dietary_restriction',
         'health_goal',
+        'goal',
         'bmi',
         'bmi_category',
+        'predicted_diet_type',
+        'health_conditions',
+        'daily_calorie_target',
     ];
 
     protected $casts = [
         'weight' => 'decimal:2',
         'height' => 'decimal:2',
         'bmi' => 'decimal:2',
+        'health_conditions' => 'array',
     ];
 
     /**
