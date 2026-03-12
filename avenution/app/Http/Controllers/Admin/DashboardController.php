@@ -16,9 +16,13 @@ class DashboardController extends Controller
             'totalUsers' => User::count(),
             'totalAnalyses' => Analysis::count(),
             'totalFoods' => Food::count(),
-            'recentAnalyses' => Analysis::latest()->take(10)->get(),
         ];
 
-        return view('admin.dashboard', compact('stats'));
+        $recentAnalyses = Analysis::with(['user', 'recommendations'])
+            ->latest()
+            ->take(10)
+            ->get();
+
+        return view('admin.dashboard', compact('stats', 'recentAnalyses'));
     }
 }
