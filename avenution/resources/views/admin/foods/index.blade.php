@@ -17,6 +17,34 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Search & Filter -->
+            <div class="bg-white dark:bg-gray-800/60 rounded-2xl shadow-lg p-6 mb-6">
+                <form action="{{ route('admin.foods.index') }}" method="GET" class="flex flex-col md:flex-row gap-4">
+                    <div class="flex-1">
+                        <input type="text" name="search" value="{{ request('search') }}" 
+                            placeholder="Search by food name..." 
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                    </div>
+                    <div class="md:w-64">
+                        <select name="category" 
+                            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            <option value="">All Categories</option>
+                            @foreach($categories as $cat)
+                                <option value="{{ $cat }}" {{ request('category') === $cat ? 'selected' : '' }}>{{ $cat }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <button type="submit" class="px-6 py-2 bg-primary hover:bg-primary-dark text-white rounded-xl font-medium transition-all">
+                        Search
+                    </button>
+                    @if(request('search') || request('category'))
+                        <a href="{{ route('admin.foods.index') }}" class="px-6 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-medium transition-all text-center">
+                            Clear
+                        </a>
+                    @endif
+                </form>
+            </div>
+
             <div class="bg-white dark:bg-gray-800/60 rounded-2xl shadow-lg overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full">
@@ -45,12 +73,15 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="px-3 py-1 rounded-full text-xs font-semibold
-                                            @if($food->category === 'breakfast') bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400
-                                            @elseif($food->category === 'lunch') bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400
-                                            @elseif($food->category === 'dinner') bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400
-                                            @else bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400
+                                            @if($food->category === 'Protein Hewani') bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400
+                                            @elseif($food->category === 'Protein Nabati') bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400
+                                            @elseif($food->category === 'Karbohidrat') bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400
+                                            @elseif($food->category === 'Sayuran') bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400
+                                            @elseif($food->category === 'Buah') bg-pink-100 dark:bg-pink-900/30 text-pink-800 dark:text-pink-400
+                                            @elseif($food->category === 'Dairy') bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400
+                                            @else bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-400
                                             @endif">
-                                            {{ ucfirst($food->category) }}
+                                            {{ $food->category }}
                                         </span>
                                     </td>
                                     <td class="px-6 py-4">
