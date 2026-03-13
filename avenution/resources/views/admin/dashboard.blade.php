@@ -11,12 +11,22 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Welcome Message -->
             <div class="bg-gradient-to-r from-primary to-primary-dark rounded-2xl shadow-lg p-8 mb-8 text-white">
-                <h1 class="text-3xl font-bold mb-2">
-                    Admin Dashboard
-                </h1>
-                <p class="text-white/80">
-                    Manage foods, users, and monitor system activity
-                </p>
+                <div class="flex items-start justify-between">
+                    <div>
+                        <h1 class="text-3xl font-bold mb-2">
+                            Welcome back, {{ auth()->user()->name }}! 👋
+                        </h1>
+                        <p class="text-white/80 mb-4">
+                            Manage the food database and monitor system activity
+                        </p>
+                        <div class="flex items-center gap-2 text-white/70 text-sm">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span>Use the navigation menu above to access "Manage Foods" directly</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Stats Grid -->
@@ -65,30 +75,51 @@
             </div>
 
             <!-- Quick Actions -->
-            <div class="grid md:grid-cols-2 gap-6 mb-8">
-                <a href="{{ route('admin.foods.index') }}" class="bg-white dark:bg-gray-800/60 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all group">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Manage Foods</h3>
-                            <p class="text-gray-600 dark:text-gray-400 text-sm">Add, edit, or remove food items</p>
+            <div class="bg-white dark:bg-gray-800/60 rounded-2xl shadow-lg p-8 mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Quick Actions</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <a href="{{ route('admin.foods.index') }}" class="group bg-gradient-to-br from-primary to-primary-dark rounded-xl shadow-lg p-6 hover:shadow-xl transition-all transform hover:scale-105">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                </svg>
+                            </div>
+                            <svg class="w-5 h-5 text-white/60 group-hover:text-white group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
                         </div>
-                        <svg class="w-8 h-8 text-primary group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                        </svg>
-                    </div>
-                </a>
+                        <h3 class="text-xl font-bold text-white mb-2">Manage Foods Database</h3>
+                        <p class="text-white/80 text-sm">View, search, edit, and delete food items ({{ $stats['totalFoods'] }} total)</p>
+                        <div class="mt-4 flex items-center gap-2 text-white/70 text-xs">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                            </svg>
+                            <span>Search, Filter, Pagination</span>
+                        </div>
+                    </a>
 
-                <a href="{{ route('admin.foods.create') }}" class="bg-white dark:bg-gray-800/60 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all group">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Add New Food</h3>
-                            <p class="text-gray-600 dark:text-gray-400 text-sm">Create a new food entry</p>
+                    <a href="{{ route('admin.foods.create') }}" class="group bg-gradient-to-br from-accent to-orange-600 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all transform hover:scale-105">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                </svg>
+                            </div>
+                            <svg class="w-5 h-5 text-white/60 group-hover:text-white group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
                         </div>
-                        <svg class="w-8 h-8 text-accent group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                        </svg>
-                    </div>
-                </a>
+                        <h3 class="text-xl font-bold text-white mb-2">Add New Food Item</h3>
+                        <p class="text-white/80 text-sm">Create a new food entry with complete nutrition information</p>
+                        <div class="mt-4 flex items-center gap-2 text-white/70 text-xs">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <span>7 Categories, Nutrition Data</span>
+                        </div>
+                    </a>
+                </div>
             </div>
 
             <!-- Recent Analyses -->
