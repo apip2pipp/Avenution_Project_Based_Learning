@@ -60,12 +60,15 @@
                 </div>
 
                 <!-- Right - Hero Image -->
-                <div class="relative">
-                    <div class="relative rounded-2xl overflow-hidden shadow-2xl shadow-gray-900/20 bg-gradient-to-br from-primary/20 to-accent/20 dark:from-primary/30 dark:to-accent/30">
-                        <div class="aspect-square bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center p-12">
-                            <svg class="w-full h-full text-primary/30" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 0l-2 2a1 1 0 101.414 1.414L8 10.414l1.293 1.293a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                            </svg>
+                            <div class="relative">
+                                <div class="relative shadow-sm">
+                                    
+                                    <img src="{{ asset('images/hero.png') }}" 
+                                        alt="Mediterranean Diet"
+                                        class="w-full h-[550px] object-cover">
+
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -137,6 +140,122 @@
                     </div>
                 @endforeach
             </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="py-24 bg-gray-50 dark:bg-gray-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+
+                <!-- Left Content -->
+                <div>
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-6">
+                        Powered by Advanced <br>
+                        Health AI Technology
+                    </h2>
+
+                    <p class="text-gray-600 dark:text-gray-400 mb-8 max-w-lg">
+                        Our proprietary AI model is trained on thousands of clinical nutrition studies and health datasets, ensuring recommendations that are both safe and effective.
+                    </p>
+
+                    <!-- Steps -->
+                    <div class="space-y-6">
+
+                        <!-- Step 1 -->
+                        <div class="flex gap-4">
+                            <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 12h6m-6 4h6M9 8h6M7 5h10a2 2 0 012 2v10a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2z"/>
+                                </svg>
+                            </div>
+
+                            <div>
+                                <h4 class="font-semibold text-gray-900 dark:text-white">Input Your Data</h4>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    Enter your body condition metrics securely.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Step 2 -->
+                        <div class="flex gap-4">
+                            <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9.75 3a6 6 0 016 6v1.5a3 3 0 003 3V15a6 6 0 11-12 0v-1.5a3 3 0 003-3V9a6 6 0 016-6z"/>
+                                </svg>
+                            </div>
+
+                            <div>
+                                <h4 class="font-semibold text-gray-900 dark:text-white">AI Analysis</h4>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    Our model processes your data in seconds.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Step 3 -->
+                        <div class="flex gap-4">
+                            <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8c-1.5 0-3 .5-3 2v6h6v-6c0-1.5-1.5-2-3-2z"/>
+                                </svg>
+                            </div>
+
+                            <div>
+                                <h4 class="font-semibold text-gray-900 dark:text-white">Get Recommendations</h4>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    Receive personalized food plans instantly.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Step 4 -->
+                        <div class="flex gap-4">
+                            <div class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 17l6-6 4 4 8-8"/>
+                                </svg>
+                            </div>
+
+                            <div>
+                                <h4 class="font-semibold text-gray-900 dark:text-white">Track Progress</h4>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                    Monitor and improve your health over time.
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Button -->
+                    <a href="{{ route('analyze') }}"
+                    class="inline-flex items-center gap-2 mt-8 px-6 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary-dark transition shadow-md hover:scale-105">
+                        Start Your Analysis
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                        </svg>
+                    </a>
+
+                </div>
+
+                <!-- Right Image -->
+                <div class="relative">
+                    <div class="rounded-2xl overflow-hidden shadow-lg">
+                        <img src="{{ asset('images/food.png') }}"
+                            alt="Healthy Food"
+                            class="w-full h-[500px] object-cover">
+                    </div>
+                </div>
+
+            </div>
+
         </div>
     </section>
 
