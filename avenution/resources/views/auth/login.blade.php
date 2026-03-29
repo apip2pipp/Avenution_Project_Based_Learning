@@ -2,15 +2,15 @@
     <x-slot name="title">Sign In</x-slot>
 
     <div x-data="{ 
-        email: '{{ old('email') }}', 
+        login: '{{ old('login') }}', 
         password: '', 
         loading: false,
         fillDemo(type) {
             if (type === 'user') {
-                this.email = 'user@avenution.com';
+                this.login = 'user@avenution.com';
                 this.password = 'password';
             } else {
-                this.email = 'admin@avenution.com';
+                this.login = 'admin';
                 this.password = 'password';
             }
         }
@@ -32,7 +32,7 @@
         </div>
 
         <!-- Google button (visual only) -->
-        <button type="button" class="w-full flex items-center justify-center gap-3 py-3 px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-200 font-medium text-sm hover:bg-gray-50 dark:hover:bg-gray-700/80 hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200 shadow-sm mb-6 group">
+        <a href="{{ route('auth.google.redirect') }}" class="w-full flex items-center justify-center gap-3 py-3 px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-200 font-medium text-sm hover:bg-gray-50 dark:hover:bg-gray-700/80 hover:border-gray-300 dark:hover:border-gray-600 transition-all duration-200 shadow-sm mb-6 group">
             <svg width="18" height="18" viewBox="0 0 18 18" class="shrink-0">
                 <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
                 <path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/>
@@ -40,12 +40,12 @@
                 <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
             </svg>
             Continue with Google
-        </button>
+        </a>
 
         <!-- OR divider -->
         <div class="flex items-center gap-3 mb-6">
             <div class="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
-            <span class="text-gray-400 dark:text-gray-500 text-xs font-medium">or continue with email</span>
+            <span class="text-gray-400 dark:text-gray-500 text-xs font-medium">or continue with password</span>
             <div class="flex-1 h-px bg-gray-200 dark:bg-gray-700"></div>
         </div>
 
@@ -71,21 +71,21 @@
             @csrf
 
             <div class="space-y-5">
-                <!-- Email -->
+                <!-- Login Identifier -->
                 <div>
-                    <label for="email" class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">
-                        Email Address
+                    <label for="login" class="block text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5">
+                        Email (User) or Username (Admin)
                     </label>
                     <div class="relative">
                         <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
                         <input 
-                            type="email"
-                            x-model="email"
-                            name="email"
-                            id="email"
-                            placeholder="you@example.com"
+                            type="text"
+                            x-model="login"
+                            name="login"
+                            id="login"
+                            placeholder="user@email.com or admin username"
                             required
                             autofocus
                             class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/60 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#C62828]/30 focus:border-[#C62828] text-sm transition-all"
