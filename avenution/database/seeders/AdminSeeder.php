@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class AdminSeeder extends Seeder
 {
@@ -14,23 +14,33 @@ class AdminSeeder extends Seeder
      */
     public function run(): void
     {
+        $adminRole = Role::findOrCreate('admin', 'web');
+        $userRole = Role::findOrCreate('user', 'web');
+
         // Create admin user
         $admin = User::firstOrCreate(
             ['email' => 'admin@avenution.com'],
             [
                 'name' => 'Admin Avenution',
+                'username' => 'admin',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
             ]
         );
-        
-        $admin->assignRole('admin');
+
+        if (! $admin->username) {
+            $admin->username = 'admin';
+            $admin->save();
+        }
+
+        $admin->syncRoles([$adminRole]);
         
         // Create sample regular user
         $user = User::firstOrCreate(
             ['email' => 'user@avenution.com'],
             [
                 'name' => 'John Doe',
+                'username' => 'user',
                 'password' => Hash::make('password'),
                 'email_verified_at' => now(),
                 'age' => 30,
@@ -39,7 +49,12 @@ class AdminSeeder extends Seeder
                 'weight' => 70.00,
             ]
         );
-        
-        $user->assignRole('user');
+
+        if (! $user->username) {
+            $user->username = 'user';
+            $user->save();
+        }
+
+        $user->syncRoles([$userRole]);
     }
 }
