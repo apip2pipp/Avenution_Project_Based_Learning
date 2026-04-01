@@ -4,11 +4,17 @@
             <!-- Brand -->
             <div class="col-span-1 md:col-span-2">
                 <div class="flex items-center gap-2 mb-4">
-                    <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                        </svg>
-                    </div>
+                        <div class="w-8 h-8 flex items-center justify-center">
+                            <!-- Logo Light -->
+                            <img src="{{ asset('images/lightmode.png') }}" 
+                                class="block dark:hidden w-full h-full object-contain" 
+                                alt="Logo Light">
+
+                            <!-- Logo Dark -->
+                            <img src="{{ asset('images/darkmode.png') }}" 
+                                class="hidden dark:block w-full h-full object-contain" 
+                                alt="Logo Dark">
+                        </div>
                     <span class="text-gray-900 dark:text-white font-bold text-xl">Avenution</span>
                 </div>
                 <p class="text-gray-600 dark:text-gray-400 text-sm max-w-md">

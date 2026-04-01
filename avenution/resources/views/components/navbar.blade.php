@@ -1,13 +1,17 @@
-<nav class="sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-[#0F172A]/80 backdrop-blur-md" x-data="{ mobileOpen: false }">
+<nav class="sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-[#0F172A]/80 backdrop-blur-md" x-data="{ mobileOpen: false, darkMode: document.documentElement.classList.contains('dark') }">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
             <!-- Logo -->
             <a href="{{ route('home') }}" class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                    </svg>
-                </div>
+                    <div class="w-8 h-8 flex items-center justify-center">
+                        <!-- Logo Light -->
+                        <img src="{{ asset('images/lightmode.png') }}" 
+                            class="block dark:hidden w-full h-full object-contain">
+
+                        <!-- Logo Dark -->
+                        <img src="{{ asset('images/darkmode.png') }}" 
+                            class="hidden dark:block w-full h-full object-contain">
+                    </div>
                 <span class="text-gray-900 dark:text-white font-bold text-xl">Avenution</span>
             </a>
 
