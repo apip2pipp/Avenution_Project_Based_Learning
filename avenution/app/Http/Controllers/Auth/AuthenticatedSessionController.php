@@ -29,6 +29,30 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        /** @var \App\Models\User|null $user */
+        $user = $request->user();
+        $pendingGoogleLink = $request->session()->pull('google_link_pending');
+
+        if (
+            $user
+            && $pendingGoogleLink
+            && ! $user->hasRole('admin')
+            && isset($pendingGoogleLink['email'])
+            && strcasecmp((string) $user->email, (string) $pendingGoogleLink['email']) === 0
+        ) {
+            $user->forceFill([
+                'google_id' => $pendingGoogleLink['google_id'] ?? $user->google_id,
+                'google_avatar' => $pendingGoogleLink['google_avatar'] ?? $user->google_avatar,
+                'name' => $pendingGoogleLink['google_name'] ?? $user->name,
+                'auth_provider' => 'google',
+                'email_verified_at' => $user->email_verified_at ?? now(),
+            ])->save();
+
+            return redirect()
+                ->intended(RouteServiceProvider::HOME)
+                ->with('status', 'Google account linked successfully.');
+        }
+
         return redirect()->intended(RouteServiceProvider::HOME);
     }
 
