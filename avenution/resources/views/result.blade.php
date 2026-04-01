@@ -87,49 +87,55 @@
                     Recommended Foods
                 </h2>
 
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    @foreach($analysis->recommendations as $recommendation)
-                        @php
-                            $food = $recommendation->food;
-                        @endphp
-                        <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:border-primary dark:hover:border-primary transition-all duration-200 hover:shadow-lg">
-                            <!-- Food Header -->
-                            <div class="flex items-start justify-between mb-4">
-                                <div>
-                                    <div class="text-4xl mb-2">{{ $food->emoji }}</div>
-                                    <h3 class="font-semibold text-gray-900 dark:text-white">{{ $food->name }}</h3>
-                                    <p class="text-sm text-gray-600 dark:text-gray-400 capitalize">{{ $recommendation->timing }}</p>
+                @if($analysis->recommendations->count() > 0)
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        @foreach($analysis->recommendations as $recommendation)
+                            @php
+                                $food = $recommendation->food;
+                            @endphp
+                            <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:border-primary dark:hover:border-primary transition-all duration-200 hover:shadow-lg">
+                                <!-- Food Header -->
+                                <div class="flex items-start justify-between mb-4">
+                                    <div>
+                                        <div class="text-4xl mb-2">{{ $food->emoji }}</div>
+                                        <h3 class="font-semibold text-gray-900 dark:text-white">{{ $food->name }}</h3>
+                                        <p class="text-sm text-gray-600 dark:text-gray-400 capitalize">{{ $recommendation->timing }}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="text-2xl font-bold text-accent">{{ $recommendation->match_score }}%</div>
+                                        <div class="text-xs text-gray-600 dark:text-gray-400">Match</div>
+                                    </div>
                                 </div>
-                                <div class="text-right">
-                                    <div class="text-2xl font-bold text-accent">{{ $recommendation->match_score }}%</div>
-                                    <div class="text-xs text-gray-600 dark:text-gray-400">Match</div>
-                                </div>
-                            </div>
 
-                            <!-- Nutrition Info -->
-                            <div class="grid grid-cols-2 gap-2 mb-4 text-sm">
-                                <div class="text-gray-600 dark:text-gray-400">Calories: <span class="font-semibold text-gray-900 dark:text-white">{{ $food->calories }}</span></div>
-                                <div class="text-gray-600 dark:text-gray-400">Protein: <span class="font-semibold text-gray-900 dark:text-white">{{ $food->protein }}g</span></div>
-                                <div class="text-gray-600 dark:text-gray-400">Carbs: <span class="font-semibold text-gray-900 dark:text-white">{{ $food->carbs }}g</span></div>
-                                <div class="text-gray-600 dark:text-gray-400">Fiber: <span class="font-semibold text-gray-900 dark:text-white">{{ $food->fiber }}g</span></div>
-                            </div>
-
-                            <!-- Benefits -->
-                            @if($food->health_benefits && count($food->health_benefits) > 0)
-                                <div class="flex flex-wrap gap-1">
-                                    @foreach(array_slice($food->health_benefits, 0, 3) as $benefit)
-                                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs">
-                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                                            </svg>
-                                            {{ $benefit }}
-                                        </span>
-                                    @endforeach
+                                <!-- Nutrition Info -->
+                                <div class="grid grid-cols-2 gap-2 mb-4 text-sm">
+                                    <div class="text-gray-600 dark:text-gray-400">Calories: <span class="font-semibold text-gray-900 dark:text-white">{{ $food->calories }}</span></div>
+                                    <div class="text-gray-600 dark:text-gray-400">Protein: <span class="font-semibold text-gray-900 dark:text-white">{{ $food->protein }}g</span></div>
+                                    <div class="text-gray-600 dark:text-gray-400">Carbs: <span class="font-semibold text-gray-900 dark:text-white">{{ $food->carbs }}g</span></div>
+                                    <div class="text-gray-600 dark:text-gray-400">Fiber: <span class="font-semibold text-gray-900 dark:text-white">{{ $food->fiber }}g</span></div>
                                 </div>
-                            @endif
-                        </div>
-                    @endforeach
-                </div>
+
+                                <!-- Benefits -->
+                                @if($food->health_benefits && count($food->health_benefits) > 0)
+                                    <div class="flex flex-wrap gap-1">
+                                        @foreach(array_slice($food->health_benefits, 0, 3) as $benefit)
+                                            <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs">
+                                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                                </svg>
+                                                {{ $benefit }}
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="rounded-xl border border-yellow-200 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-800 p-5 text-yellow-800 dark:text-yellow-300">
+                        No recommendations available yet. Please try running analysis again.
+                    </div>
+                @endif
             </div>
 
             <!-- CTA for Guest Users -->
