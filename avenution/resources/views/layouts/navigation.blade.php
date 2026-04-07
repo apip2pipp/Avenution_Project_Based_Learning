@@ -6,12 +6,20 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     @if(auth()->user()->hasRole('admin'))
-                        <a href="{{ route('admin.dashboard') }}">
-                            <x-application-logo class="block h-9 w-auto fill-current text-gray-800 dark:text-white" />
+                        <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2">
+                            <img src="{{ asset('images/lightmode.png') }}" 
+                                class="block dark:hidden h-8 w-auto">
+                            <img src="{{ asset('images/darkmode.png') }}" 
+                                class="hidden dark:block h-8 w-auto">
+                            <span class="font-bold text-gray-800 dark:text-white">Avenution</span>
                         </a>
                     @else
-                        <a href="{{ route('dashboard') }}">
-                            <x-application-logo class="block h-9 w-auto fill-current text-gray-800 dark:text-white" />
+                        <a href="{{ route('dashboard') }}" class="flex items-center gap-2">
+                            <img src="{{ asset('images/lightmode.png') }}" 
+                                class="block dark:hidden h-8 w-auto">
+                            <img src="{{ asset('images/darkmode.png') }}" 
+                                class="hidden dark:block h-8 w-auto">
+                            <span class="font-bold text-gray-800 dark:text-white">Avenution</span>
                         </a>
                     @endif
                 </div>
