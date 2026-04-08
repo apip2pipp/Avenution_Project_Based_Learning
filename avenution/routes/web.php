@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\FoodController;
+use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -46,7 +47,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
     
     // Food Management
+    Route::get('foods/import', [FoodController::class, 'importForm'])->name('foods.import.form');
+    Route::post('foods/import/preview', [FoodController::class, 'previewImport'])->name('foods.import.preview');
+    Route::post('foods/import/confirm', [FoodController::class, 'confirmImport'])->name('foods.import.confirm');
+    Route::post('foods/import/cancel', [FoodController::class, 'cancelImport'])->name('foods.import.cancel');
     Route::resource('foods', FoodController::class);
+
+    // User Management
+    Route::resource('users', UserController::class)->except(['show']);
 });
 
 require __DIR__.'/auth.php';

@@ -4,12 +4,18 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use App\Models\Food;
+use App\Services\FoodCsvImportService;
+use App\Http\Requests\ImportFoodsCsvRequest;
 use App\Http\Requests\StoreFoodRequest;
 use App\Http\Requests\UpdateFoodRequest;
 
 class FoodController extends Controller
 {
+    private const IMPORT_SESSION_KEY = 'admin_food_import';
+
     /**
      * Display a listing of the resource.
      */
@@ -41,6 +47,102 @@ class FoodController extends Controller
     public function create()
     {
         return view('admin.foods.create');
+    }
+
+    /**
+     * Show CSV import form for bulk upload.
+     */
+    public function importForm()
+    {
+        return view('admin.foods.import');
+    }
+
+    /**
+     * Parse uploaded CSV and show preview before importing.
+     */
+    public function previewImport(ImportFoodsCsvRequest $request, FoodCsvImportService $importService)
+    {
+        $previousImport = session(self::IMPORT_SESSION_KEY);
+        if (!empty($previousImport['path']) && Storage::exists($previousImport['path'])) {
+            Storage::delete($previousImport['path']);
+        }
+
+        $uploadedFile = $request->file('csv_file');
+        $storedPath = $uploadedFile->store('tmp/food-imports');
+        $preview = $importService->previewFromStoragePath($storedPath);
+
+        $token = (string) Str::uuid();
+        session([
+            self::IMPORT_SESSION_KEY => [
+                'token' => $token,
+                'path' => $storedPath,
+                'filename' => $uploadedFile->getClientOriginalName(),
+            ],
+        ]);
+
+        return view('admin.foods.import-preview', [
+            'preview' => $preview,
+            'importToken' => $token,
+            'uploadedFilename' => $uploadedFile->getClientOriginalName(),
+        ]);
+    }
+
+    /**
+     * Persist rows from previewed CSV import.
+     */
+    public function confirmImport(Request $request, FoodCsvImportService $importService)
+    {
+        $request->validate([
+            'import_token' => ['required', 'string'],
+        ]);
+
+        $importSession = session(self::IMPORT_SESSION_KEY);
+
+        if (!$importSession || ($importSession['token'] ?? null) !== $request->string('import_token')->toString()) {
+            return redirect()->route('admin.foods.import.form')
+                ->with('error', 'Sesi preview import sudah tidak valid. Silakan upload ulang file CSV.');
+        }
+
+        $storedPath = $importSession['path'] ?? null;
+
+        if (!$storedPath || !Storage::exists($storedPath)) {
+            session()->forget(self::IMPORT_SESSION_KEY);
+
+            return redirect()->route('admin.foods.import.form')
+                ->with('error', 'File CSV preview tidak ditemukan. Silakan upload ulang.');
+        }
+
+        $result = $importService->importFromStoragePath($storedPath);
+
+        Storage::delete($storedPath);
+        session()->forget(self::IMPORT_SESSION_KEY);
+
+        $message = sprintf(
+            'Import selesai. Berhasil: %d, Duplikat di-skip: %d, Error: %d.',
+            $result['inserted_rows'],
+            $result['duplicate_rows'],
+            $result['error_rows']
+        );
+
+        return redirect()->route('admin.foods.index')->with('success', $message);
+    }
+
+    /**
+     * Cancel current CSV import session and cleanup temporary file.
+     */
+    public function cancelImport()
+    {
+        $importSession = session(self::IMPORT_SESSION_KEY);
+        $storedPath = $importSession['path'] ?? null;
+
+        if ($storedPath && Storage::exists($storedPath)) {
+            Storage::delete($storedPath);
+        }
+
+        session()->forget(self::IMPORT_SESSION_KEY);
+
+        return redirect()->route('admin.foods.import.form')
+            ->with('success', 'Import dibatalkan dan file sementara sudah dihapus.');
     }
 
     /**

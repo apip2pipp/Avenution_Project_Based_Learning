@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-admin-layout>
     <x-slot name="title">Add New Food</x-slot>
 
     <x-slot name="header">
@@ -234,4 +234,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</x-admin-layout>
