@@ -1,5 +1,5 @@
 <x-guest-layout>
-    <x-slot name="title">Home - Smart Food Recommendations</x-slot>
+    <x-slot name="title">Home</x-slot>
 
     <!-- Hero Section -->
     <section class="relative overflow-hidden pt-16 pb-24 lg:pt-24 lg:pb-32">
