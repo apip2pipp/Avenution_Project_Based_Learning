@@ -21,7 +21,7 @@ class FoodCsvImportService
 
     private const MAX_ROWS = 5000;
 
-    public function previewFromStoragePath(string $storagePath): array
+    public function previewFromStoragePath(string $storagePath, array $manualMapping = []): array
     {
         if (!Storage::exists($storagePath)) {
             return [
@@ -35,17 +35,22 @@ class FoodCsvImportService
                 'duplicate_names' => [],
                 'errors' => ['File CSV tidak ditemukan di storage sementara.'],
                 'detected_headers' => [],
+                'requires_mapping' => false,
+                'mappable_fields' => $this->mappableFields(),
+                'mapping_errors' => [],
+                'selected_mapping' => [],
+                'auto_mapping_applied' => false,
             ];
         }
 
         $absolutePath = Storage::path($storagePath);
 
-        return $this->parseCsv($absolutePath);
+        return $this->parseCsv($absolutePath, $manualMapping);
     }
 
-    public function importFromStoragePath(string $storagePath): array
+    public function importFromStoragePath(string $storagePath, array $manualMapping = []): array
     {
-        $preview = $this->previewFromStoragePath($storagePath);
+        $preview = $this->previewFromStoragePath($storagePath, $manualMapping);
 
         $rows = $preview['insertable_rows'];
         $inserted = 0;
@@ -76,7 +81,7 @@ class FoodCsvImportService
         ];
     }
 
-    private function parseCsv(string $absolutePath): array
+    private function parseCsv(string $absolutePath, array $manualMapping = []): array
     {
         $file = fopen($absolutePath, 'r');
 
@@ -92,28 +97,74 @@ class FoodCsvImportService
                 'duplicate_names' => [],
                 'errors' => ['Gagal membuka file CSV.'],
                 'detected_headers' => [],
+                'requires_mapping' => false,
+                'mappable_fields' => $this->mappableFields(),
+                'mapping_errors' => [],
+                'selected_mapping' => [],
+                'auto_mapping_applied' => false,
             ];
         }
 
         $headers = fgetcsv($file) ?: [];
         $normalizedHeaders = array_map(fn ($header) => $this->normalizeHeader((string) $header), $headers);
         $schema = $this->detectSchema($normalizedHeaders);
+        $manualMappingProvided = !empty($manualMapping);
 
         if ($schema === 'unknown') {
-            fclose($file);
+            $autoSuggestion = $this->suggestMapping($headers, $normalizedHeaders);
+            $effectiveMapping = $manualMappingProvided ? $manualMapping : $autoSuggestion;
 
-            return [
-                'schema' => 'unknown',
-                'total_rows' => 0,
-                'valid_rows' => 0,
-                'duplicate_rows' => 0,
-                'error_rows' => 1,
-                'insertable_rows' => [],
-                'preview_rows' => [],
-                'duplicate_names' => [],
-                'errors' => ['Format CSV tidak dikenali. Gunakan format simple, nutrition.csv, atau nilai-gizi.csv.'],
-                'detected_headers' => $headers,
-            ];
+            if (empty($effectiveMapping)) {
+                $analysis = $this->analyzeUnknownSchemaRows($file, $headers, $normalizedHeaders);
+                fclose($file);
+
+                return [
+                    'schema' => 'unknown',
+                    'total_rows' => $analysis['total_rows'],
+                    'valid_rows' => 0,
+                    'duplicate_rows' => 0,
+                    'error_rows' => 1,
+                    'insertable_rows' => [],
+                    'preview_rows' => [],
+                    'duplicate_names' => [],
+                    'errors' => ['Format CSV belum dikenali otomatis. Pilih mapping kolom dulu untuk lanjut preview import.'],
+                    'detected_headers' => $headers,
+                    'requires_mapping' => true,
+                    'mappable_fields' => $this->mappableFields(),
+                    'mapping_errors' => [],
+                    'selected_mapping' => $autoSuggestion,
+                    'source_preview_rows' => $analysis['source_preview_rows'],
+                    'auto_mapping_applied' => false,
+                ];
+            }
+
+            $mappingValidation = $this->validateManualMapping($effectiveMapping, $normalizedHeaders);
+            if (!empty($mappingValidation)) {
+                $analysis = $this->analyzeUnknownSchemaRows($file, $headers, $normalizedHeaders);
+                fclose($file);
+
+                return [
+                    'schema' => 'unknown',
+                    'total_rows' => $analysis['total_rows'],
+                    'valid_rows' => 0,
+                    'duplicate_rows' => 0,
+                    'error_rows' => count($mappingValidation),
+                    'insertable_rows' => [],
+                    'preview_rows' => [],
+                    'duplicate_names' => [],
+                    'errors' => [],
+                    'detected_headers' => $headers,
+                    'requires_mapping' => true,
+                    'mappable_fields' => $this->mappableFields(),
+                    'mapping_errors' => $mappingValidation,
+                    'selected_mapping' => $effectiveMapping,
+                    'source_preview_rows' => $analysis['source_preview_rows'],
+                    'auto_mapping_applied' => false,
+                ];
+            }
+
+            $schema = 'mapped';
+            $manualMapping = $effectiveMapping;
         }
 
         $existingNames = Food::pluck('name')->map(fn ($name) => Str::lower(trim($name)))->toArray();
@@ -137,7 +188,7 @@ class FoodCsvImportService
                 break;
             }
 
-            $mapped = $this->mapRowBySchema($schema, $normalizedHeaders, $row);
+            $mapped = $this->mapRowBySchema($schema, $normalizedHeaders, $row, $manualMapping);
             $rowNumber = $totalRows + 1;
 
             $nameKey = Str::lower(trim((string) ($mapped['name'] ?? '')));
@@ -182,6 +233,12 @@ class FoodCsvImportService
             'duplicate_names' => array_slice($duplicateNames, 0, 20),
             'errors' => array_slice($errors, 0, 30),
             'detected_headers' => $headers,
+            'requires_mapping' => false,
+            'mappable_fields' => $this->mappableFields(),
+            'mapping_errors' => [],
+            'selected_mapping' => $manualMapping,
+            'source_preview_rows' => [],
+            'auto_mapping_applied' => $schema === 'mapped' && !$manualMappingProvided,
         ];
     }
 
@@ -207,11 +264,44 @@ class FoodCsvImportService
         return $isSimple ? 'simple' : 'unknown';
     }
 
-    private function mapRowBySchema(string $schema, array $headers, array $row): array
+    private function mapRowBySchema(string $schema, array $headers, array $row, array $manualMapping = []): array
     {
         $data = [];
         foreach ($headers as $index => $header) {
             $data[$header] = $row[$index] ?? null;
+        }
+
+        if ($schema === 'mapped') {
+            $mapped = [];
+            foreach ($manualMapping as $targetField => $sourceHeader) {
+                $normalizedSource = $this->normalizeHeader((string) $sourceHeader);
+                $mapped[$targetField] = $data[$normalizedSource] ?? null;
+            }
+
+            $name = (string) ($mapped['name'] ?? '');
+            $category = (string) ($mapped['category'] ?? '');
+            $resolvedCategory = in_array($category, self::CATEGORY_OPTIONS, true)
+                ? $category
+                : $this->determineCategory($name);
+
+            return [
+                'name' => $mapped['name'] ?? null,
+                'category' => $resolvedCategory,
+                'calories' => $mapped['calories'] ?? 0,
+                'protein' => $mapped['protein'] ?? $mapped['proteins'] ?? 0,
+                'carbs' => $mapped['carbs'] ?? $mapped['carbohydrate'] ?? 0,
+                'fat' => $mapped['fat'] ?? 0,
+                'fiber' => $mapped['fiber'] ?? null,
+                'sugars' => $mapped['sugars'] ?? null,
+                'sodium' => $mapped['sodium'] ?? null,
+                'cholesterol' => $mapped['cholesterol'] ?? null,
+                'meal_type' => $mapped['meal_type'] ?? $this->determineMealType($name),
+                'description' => $mapped['description'] ?? null,
+                'image_url' => $mapped['image_url'] ?? $mapped['image'] ?? null,
+                'dietary_tags' => $mapped['dietary_tags'] ?? null,
+                'health_benefits' => $mapped['health_benefits'] ?? null,
+                'emoji' => $mapped['emoji'] ?? $this->determineEmoji($resolvedCategory, $name),
+            ];
         }
 
         if ($schema === 'nutrition') {
@@ -316,6 +406,200 @@ class FoodCsvImportService
             'dietary_tags' => $data['dietary_tags'] ?? null,
             'health_benefits' => $data['health_benefits'] ?? null,
             'emoji' => $data['emoji'] ?? $this->determineEmoji($resolvedCategory, $name),
+        ];
+    }
+
+    private function mappableFields(): array
+    {
+        return [
+            'required' => ['name', 'calories', 'protein', 'carbs', 'fat'],
+            'optional' => [
+                'category',
+                'fiber',
+                'sugars',
+                'sodium',
+                'cholesterol',
+                'meal_type',
+                'description',
+                'image_url',
+                'dietary_tags',
+                'health_benefits',
+                'emoji',
+            ],
+        ];
+    }
+
+    private function suggestMapping(array $headers, array $normalizedHeaders): array
+    {
+        $aliases = $this->fieldAliases();
+        $available = [];
+
+        foreach ($headers as $index => $rawHeader) {
+            $normalized = $normalizedHeaders[$index] ?? $this->normalizeHeader((string) $rawHeader);
+            if ($normalized === '') {
+                continue;
+            }
+
+            $available[$normalized] = (string) $rawHeader;
+        }
+
+        $used = [];
+        $mapping = [];
+        $targets = [...$this->mappableFields()['required'], ...$this->mappableFields()['optional']];
+
+        foreach ($targets as $target) {
+            $source = $this->findBestSourceHeader($aliases[$target] ?? [$target], $available, $used);
+            if ($source === null) {
+                continue;
+            }
+
+            $mapping[$target] = $source;
+            $used[$this->normalizeHeader($source)] = true;
+        }
+
+        return $mapping;
+    }
+
+    private function fieldAliases(): array
+    {
+        return [
+            'name' => ['name', 'food_name', 'nama', 'nama_makanan', 'item', 'menu', 'food'],
+            'calories' => ['calories', 'calorie', 'energy_kcal', 'kcal', 'energi', 'kalori', 'kkal'],
+            'protein' => ['protein', 'proteins', 'protein_g', 'prot', 'protein_gram'],
+            'carbs' => ['carbs', 'carbohydrate', 'carbohydrates', 'carbohydrate_g', 'karbo', 'karbohidrat', 'karbohidrat_g'],
+            'fat' => ['fat', 'fats', 'fat_g', 'lemak', 'lemak_g'],
+            'category' => ['category', 'kategori', 'group', 'food_group'],
+            'fiber' => ['fiber', 'fibre', 'fiber_g', 'serat', 'serat_g'],
+            'sugars' => ['sugar', 'sugars', 'sugar_g', 'gula', 'gula_g'],
+            'sodium' => ['sodium', 'sodium_mg', 'natrium', 'garam', 'salt', 'salt_mg'],
+            'cholesterol' => ['cholesterol', 'kolesterol', 'kolesterol_mg'],
+            'meal_type' => ['meal_type', 'meal', 'tipe_makan', 'waktu_makan'],
+            'description' => ['description', 'desc', 'deskripsi', 'keterangan', 'notes'],
+            'image_url' => ['image_url', 'image', 'img', 'photo', 'foto', 'picture', 'thumbnail'],
+            'dietary_tags' => ['dietary_tags', 'diet_tags', 'tags', 'label_diet'],
+            'health_benefits' => ['health_benefits', 'benefits', 'manfaat', 'benefit'],
+            'emoji' => ['emoji', 'icon', 'ikon'],
+        ];
+    }
+
+    private function findBestSourceHeader(array $aliases, array $available, array $used): ?string
+    {
+        $bestSource = null;
+        $bestScore = -1;
+
+        foreach ($available as $normalizedHeader => $rawHeader) {
+            if (isset($used[$normalizedHeader])) {
+                continue;
+            }
+
+            $score = 0;
+            foreach ($aliases as $alias) {
+                $normalizedAlias = $this->normalizeHeader($alias);
+                if ($normalizedAlias === '') {
+                    continue;
+                }
+
+                if ($normalizedHeader === $normalizedAlias) {
+                    $score = max($score, 100);
+                    continue;
+                }
+
+                if (str_contains($normalizedHeader, $normalizedAlias) || str_contains($normalizedAlias, $normalizedHeader)) {
+                    $score = max($score, 80);
+                    continue;
+                }
+
+                $distance = levenshtein($normalizedHeader, $normalizedAlias);
+                if ($distance <= 2) {
+                    $score = max($score, 65);
+                }
+            }
+
+            if ($score > $bestScore) {
+                $bestScore = $score;
+                $bestSource = $rawHeader;
+            }
+        }
+
+        if ($bestScore < 65) {
+            return null;
+        }
+
+        return $bestSource;
+    }
+
+    private function validateManualMapping(array $manualMapping, array $normalizedHeaders): array
+    {
+        $errors = [];
+        $allFields = [
+            ...$this->mappableFields()['required'],
+            ...$this->mappableFields()['optional'],
+        ];
+
+        foreach ($manualMapping as $targetField => $sourceHeader) {
+            if (!in_array($targetField, $allFields, true)) {
+                continue;
+            }
+
+            $normalizedSource = $this->normalizeHeader((string) $sourceHeader);
+            if (!in_array($normalizedSource, $normalizedHeaders, true)) {
+                $errors[] = 'Kolom sumber untuk field "' . $targetField . '" tidak ditemukan di header CSV.';
+            }
+        }
+
+        foreach ($this->mappableFields()['required'] as $requiredField) {
+            if (!array_key_exists($requiredField, $manualMapping) || trim((string) $manualMapping[$requiredField]) === '') {
+                $errors[] = 'Mapping wajib untuk field "' . $requiredField . '" belum dipilih.';
+            }
+        }
+
+        $selectedSources = [];
+        foreach ($manualMapping as $sourceHeader) {
+            $normalizedSource = $this->normalizeHeader((string) $sourceHeader);
+            if ($normalizedSource === '') {
+                continue;
+            }
+
+            if (isset($selectedSources[$normalizedSource])) {
+                $errors[] = 'Satu kolom CSV tidak boleh dipakai untuk beberapa field target.';
+                break;
+            }
+
+            $selectedSources[$normalizedSource] = true;
+        }
+
+        return $errors;
+    }
+
+    private function analyzeUnknownSchemaRows($file, array $headers, array $normalizedHeaders): array
+    {
+        $totalRows = 0;
+        $previewRows = [];
+
+        while (($row = fgetcsv($file)) !== false) {
+            if ($this->rowIsEmpty($row)) {
+                continue;
+            }
+
+            $totalRows++;
+
+            if (count($previewRows) < 5) {
+                $rowData = [];
+                foreach ($normalizedHeaders as $index => $normalizedHeader) {
+                    $rawHeader = $headers[$index] ?? $normalizedHeader;
+                    $rowData[(string) $rawHeader] = $row[$index] ?? null;
+                }
+                $previewRows[] = $rowData;
+            }
+
+            if ($totalRows > self::MAX_ROWS) {
+                break;
+            }
+        }
+
+        return [
+            'total_rows' => $totalRows,
+            'source_preview_rows' => $previewRows,
         ];
     }
 

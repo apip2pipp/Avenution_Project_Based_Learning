@@ -14,7 +14,10 @@ class ImportFoodsCsvRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'csv_file' => ['required', 'file', 'mimes:csv,txt', 'max:10240'],
+            'import_token' => ['nullable', 'string'],
+            'csv_file' => ['required_without:import_token', 'file', 'mimes:csv,txt', 'max:10240'],
+            'mapping' => ['nullable', 'array'],
+            'mapping.*' => ['nullable', 'string'],
         ];
     }
 

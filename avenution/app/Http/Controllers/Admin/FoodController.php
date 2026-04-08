@@ -62,28 +62,63 @@ class FoodController extends Controller
      */
     public function previewImport(ImportFoodsCsvRequest $request, FoodCsvImportService $importService)
     {
-        $previousImport = session(self::IMPORT_SESSION_KEY);
-        if (!empty($previousImport['path']) && Storage::exists($previousImport['path'])) {
-            Storage::delete($previousImport['path']);
+        $importToken = $request->string('import_token')->toString();
+        $manualMapping = $this->sanitizeMapping($request->input('mapping', []));
+
+        if ($importToken !== '') {
+            $importSession = session(self::IMPORT_SESSION_KEY);
+
+            if (!$importSession || ($importSession['token'] ?? null) !== $importToken) {
+                return redirect()->route('admin.foods.import.form')
+                    ->with('error', 'Sesi preview import sudah tidak valid. Silakan upload ulang file CSV.');
+            }
+
+            $storedPath = $importSession['path'] ?? null;
+            if (!$storedPath || !Storage::exists($storedPath)) {
+                session()->forget(self::IMPORT_SESSION_KEY);
+
+                return redirect()->route('admin.foods.import.form')
+                    ->with('error', 'File CSV preview tidak ditemukan. Silakan upload ulang.');
+            }
+
+            $preview = $importService->previewFromStoragePath($storedPath, $manualMapping);
+
+            session([
+                self::IMPORT_SESSION_KEY => [
+                    ...$importSession,
+                    'mapping' => $preview['schema'] === 'mapped' ? ($preview['selected_mapping'] ?? []) : ($importSession['mapping'] ?? []),
+                ],
+            ]);
+
+            $token = $importSession['token'];
+            $uploadedFilename = $importSession['filename'] ?? 'dataset.csv';
+        } else {
+            $previousImport = session(self::IMPORT_SESSION_KEY);
+            if (!empty($previousImport['path']) && Storage::exists($previousImport['path'])) {
+                Storage::delete($previousImport['path']);
+            }
+
+            $uploadedFile = $request->file('csv_file');
+            $storedPath = $uploadedFile->store('tmp/food-imports');
+            $preview = $importService->previewFromStoragePath($storedPath);
+
+            $token = (string) Str::uuid();
+            $uploadedFilename = $uploadedFile->getClientOriginalName();
+
+            session([
+                self::IMPORT_SESSION_KEY => [
+                    'token' => $token,
+                    'path' => $storedPath,
+                    'filename' => $uploadedFilename,
+                    'mapping' => $preview['schema'] === 'mapped' ? ($preview['selected_mapping'] ?? []) : [],
+                ],
+            ]);
         }
-
-        $uploadedFile = $request->file('csv_file');
-        $storedPath = $uploadedFile->store('tmp/food-imports');
-        $preview = $importService->previewFromStoragePath($storedPath);
-
-        $token = (string) Str::uuid();
-        session([
-            self::IMPORT_SESSION_KEY => [
-                'token' => $token,
-                'path' => $storedPath,
-                'filename' => $uploadedFile->getClientOriginalName(),
-            ],
-        ]);
 
         return view('admin.foods.import-preview', [
             'preview' => $preview,
             'importToken' => $token,
-            'uploadedFilename' => $uploadedFile->getClientOriginalName(),
+            'uploadedFilename' => $uploadedFilename,
         ]);
     }
 
@@ -112,7 +147,7 @@ class FoodController extends Controller
                 ->with('error', 'File CSV preview tidak ditemukan. Silakan upload ulang.');
         }
 
-        $result = $importService->importFromStoragePath($storedPath);
+        $result = $importService->importFromStoragePath($storedPath, $importSession['mapping'] ?? []);
 
         Storage::delete($storedPath);
         session()->forget(self::IMPORT_SESSION_KEY);
@@ -192,5 +227,26 @@ class FoodController extends Controller
 
         return redirect()->route('admin.foods.index')
             ->with('success', 'Food item deleted successfully!');
+    }
+
+    private function sanitizeMapping(array $mapping): array
+    {
+        $clean = [];
+
+        foreach ($mapping as $target => $header) {
+            $targetKey = trim((string) $target);
+            if ($targetKey === '') {
+                continue;
+            }
+
+            $headerValue = trim((string) $header);
+            if ($headerValue === '') {
+                continue;
+            }
+
+            $clean[$targetKey] = $headerValue;
+        }
+
+        return $clean;
     }
 }
