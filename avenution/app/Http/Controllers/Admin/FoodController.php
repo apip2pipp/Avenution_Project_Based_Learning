@@ -153,8 +153,9 @@ class FoodController extends Controller
         session()->forget(self::IMPORT_SESSION_KEY);
 
         $message = sprintf(
-            'Import selesai. Berhasil: %d, Duplikat di-skip: %d, Error: %d.',
+            'Import selesai. Data baru: %d, Data diperbarui: %d, Duplikat dalam file: %d, Error: %d.',
             $result['inserted_rows'],
+            $result['updated_rows'] ?? 0,
             $result['duplicate_rows'],
             $result['error_rows']
         );
