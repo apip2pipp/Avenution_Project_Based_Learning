@@ -54,26 +54,34 @@ class FoodCsvImportService
 
         $rows = $preview['insertable_rows'];
         $inserted = 0;
+        $updated = 0;
 
-        foreach (array_chunk($rows, 200) as $chunk) {
-            $payload = array_map(function (array $row) {
-                return [
-                    ...$row,
-                    'dietary_tags' => json_encode($row['dietary_tags']),
-                    'health_benefits' => json_encode($row['health_benefits']),
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-            }, $chunk);
+        foreach ($rows as $row) {
+            $nameKey = Str::lower(trim((string) ($row['name'] ?? '')));
+            if ($nameKey === '') {
+                continue;
+            }
 
-            Food::insert($payload);
-            $inserted += count($payload);
+            $existingFood = Food::query()
+                ->whereRaw('LOWER(TRIM(name)) = ?', [$nameKey])
+                ->first();
+
+            if ($existingFood) {
+                $existingFood->fill($row);
+                $existingFood->save();
+                $updated++;
+                continue;
+            }
+
+            Food::create($row);
+            $inserted++;
         }
 
         return [
             'schema' => $preview['schema'],
             'total_rows' => $preview['total_rows'],
             'inserted_rows' => $inserted,
+            'updated_rows' => $updated,
             'duplicate_rows' => $preview['duplicate_rows'],
             'error_rows' => $preview['error_rows'],
             'duplicate_names' => $preview['duplicate_names'],
@@ -167,10 +175,7 @@ class FoodCsvImportService
             $manualMapping = $effectiveMapping;
         }
 
-        $existingNames = Food::pluck('name')->map(fn ($name) => Str::lower(trim($name)))->toArray();
-        $knownNames = array_fill_keys($existingNames, true);
-
-        $insertableRows = [];
+        $insertableRowsByName = [];
         $previewRows = [];
         $duplicateNames = [];
         $errors = [];
@@ -197,11 +202,6 @@ class FoodCsvImportService
                 continue;
             }
 
-            if (isset($knownNames[$nameKey])) {
-                $duplicateNames[] = $mapped['name'];
-                continue;
-            }
-
             $normalized = $this->normalizeMappedRow($mapped);
             $validator = Validator::make($normalized, $this->validationRules());
 
@@ -212,15 +212,18 @@ class FoodCsvImportService
             }
 
             $validated = $validator->validated();
-            $insertableRows[] = $validated;
-            $knownNames[$nameKey] = true;
-
-            if (count($previewRows) < 20) {
-                $previewRows[] = $validated;
+            if (isset($insertableRowsByName[$nameKey])) {
+                $duplicateNames[] = $mapped['name'];
             }
+
+            // For duplicated names inside one CSV file, keep the latest row.
+            $insertableRowsByName[$nameKey] = $validated;
         }
 
         fclose($file);
+
+        $insertableRows = array_values($insertableRowsByName);
+        $previewRows = array_slice($insertableRows, 0, 20);
 
         return [
             'schema' => $schema,
