@@ -5,14 +5,14 @@
     <section class="relative overflow-hidden pt-16 pb-24 lg:pt-24 lg:pb-32">
         <!-- Background gradient -->
         <div class="absolute inset-0 pointer-events-none">
-            <div class="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
-            <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl"></div>
+            <div class="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl opacity-90 animate-float-slow"></div>
+            <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl opacity-90 animate-float-slow"></div>
         </div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
             <div class="grid lg:grid-cols-2 gap-12 items-center">
                 <!-- Left Content -->
-                <div>
+                <div class="animate-fade-in-up">
                     <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary dark:text-primary-light text-xs font-semibold mb-6">
                         <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.476.859h4.002z"/>
@@ -63,7 +63,7 @@
                                     
                                 <img src="{{ asset('images/hero.png') }}" 
                                     alt="Mediterranean Diet"
-                                    class="w-full h-[550px] object-contain">
+                                    class="w-full h-[550px] object-contain animate-float transition-transform duration-500 ease-in-out hover:scale-[1.02]">
                         </div>
                     </div>
                 </div>
@@ -80,8 +80,8 @@
                     ['value' => $stats['accuracy'], 'label' => 'Accuracy Rate'],
                     ['value' => $stats['foods'], 'label' => 'Food Database'],
                     ['value' => $stats['rating'], 'label' => 'User Rating'],
-                ] as $stat)
-                    <div class="text-center">
+                ] as $index => $stat)
+                    <div class="text-center animate-counter animate-delay-{{ ($index + 1) * 100 }}">
                         <div class="text-3xl md:text-4xl font-bold text-primary mb-2">{{ $stat['value'] }}</div>
                         <div class="text-sm text-gray-600 dark:text-gray-400">{{ $stat['label'] }}</div>
                     </div>
@@ -124,7 +124,7 @@
                         'textColor' => 'text-blue-600 dark:text-blue-400',
                     ],
                 ] as $feature)
-                    <div class="p-6 rounded-2xl border border-gray-200 dark:border-gray-700 hover:border-primary dark:hover:border-primary transition-all duration-200 hover:shadow-lg">
+                    <div class="p-6 rounded-2xl border border-gray-200 dark:border-gray-700 hover:border-primary dark:hover:border-primary transition-all duration-200 hover:shadow-lg hover:-translate-y-2">
                         <div class="w-12 h-12 rounded-xl {{ $feature['color'] }} flex items-center justify-center mb-4">
                             <svg class="w-6 h-6 {{ $feature['textColor'] }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 {!! $feature['icon'] !!}
@@ -259,7 +259,7 @@
             <p class="text-gray-600 dark:text-gray-400 text-lg mb-8">
                 Get personalized food recommendations in minutes. No credit card required.
             </p>
-            <a href="{{ route('analyze') }}" class="inline-flex items-center gap-2 px-8 py-4 bg-primary hover:bg-primary-dark text-white rounded-xl font-semibold transition-all duration-200 shadow-lg hover:scale-105">
+            <a href="{{ route('analyze') }}" class="inline-flex items-center gap-2 px-8 py-4 bg-primary hover:bg-primary-dark text-white rounded-xl font-semibold transition-all duration-200 shadow-lg hover:scale-105 animate-pulse-glow">
                 Get Started Free
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
