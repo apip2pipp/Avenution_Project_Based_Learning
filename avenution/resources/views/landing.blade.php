@@ -60,15 +60,10 @@
                 </div>
 
                 <!-- Right - Hero Image -->
-                            <div class="relative">
-                                <div class="relative shadow-sm">
                                     
-                                    <img src="{{ asset('images/hero.png') }}" 
-                                        alt="Mediterranean Diet"
-                                        class="w-full h-[550px] object-cover">
-
-                                </div>
-                            </div>
+                                <img src="{{ asset('images/hero.png') }}" 
+                                    alt="Mediterranean Diet"
+                                    class="w-full h-[550px] object-contain">
                         </div>
                     </div>
                 </div>
@@ -246,13 +241,9 @@
                 </div>
 
                 <!-- Right Image -->
-                <div class="relative">
-                    <div class="rounded-2xl overflow-hidden shadow-lg">
-                        <img src="{{ asset('images/food.png') }}"
-                            alt="Healthy Food"
-                            class="w-full h-[500px] object-cover">
-                    </div>
-                </div>
+                <img src="{{ asset('images/food.png') }}"
+                    alt="Healthy Food"
+                    class="w-full h-[500px] object-contain">
 
             </div>
 
