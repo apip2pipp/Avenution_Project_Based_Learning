@@ -78,7 +78,7 @@ class GoogleAuthController extends Controller
         $user = User::create([
             'name' => $googleUser->getName() ?: 'Google User',
             'email' => $email,
-            'password' => Hash::make(Str::random(40)),
+            'password' => null,
             'google_id' => $googleId,
             'google_avatar' => $googleUser->getAvatar(),
             'auth_provider' => 'google',

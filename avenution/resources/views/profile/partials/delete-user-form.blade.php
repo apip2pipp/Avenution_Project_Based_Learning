@@ -14,17 +14,29 @@
         x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')"
     >{{ __('Delete Account') }}</x-danger-button>
 
-    <x-modal name="confirm-user-deletion" :show="$errors->userDeletion->isNotEmpty()" focusable>
-        <form method="post" action="{{ route('profile.destroy') }}" class="p-6">
-            @csrf
-            @method('delete')
+    
+<x-modal 
+    name="confirm-user-deletion" 
+    :show="auth()->user()->password && $errors->userDeletion->isNotEmpty()" 
+    focusable>
+    
+    <form method="post" action="{{ route('profile.destroy') }}" class="p-6">
+        @csrf
+        @method('delete')
 
-            <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
-                {{ __('Are you sure you want to delete your account?') }}
-            </h2>
+        <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
+            {{ __('Are you sure you want to delete your account?') }}
+        </h2>
 
-            <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">
-                {{ __('Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.') }}
+        <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">
+            {{ __('Once your account is deleted, all of its resources and data will be permanently deleted.') }}
+        </p>
+
+        {{-- 🔥 CONDITIONAL --}}
+        @if(auth()->user()->password)
+
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">
+                {{ __('Please enter your password to confirm.') }}
             </p>
 
             <div class="mt-6">
@@ -41,15 +53,23 @@
                 <x-input-error :messages="$errors->userDeletion->get('password')" class="mt-2" />
             </div>
 
-            <div class="mt-6 flex justify-end">
-                <x-secondary-button x-on:click="$dispatch('close')">
-                    {{ __('Cancel') }}
-                </x-secondary-button>
+        @else
 
-                <x-danger-button class="ms-3">
-                    {{ __('Delete Account') }}
-                </x-danger-button>
-            </div>
-        </form>
-    </x-modal>
+            <p class="mt-2 text-sm text-yellow-500">
+                {{ __('You are logged in via Google. No password is required.') }}
+            </p>
+
+        @endif
+
+        <div class="mt-6 flex justify-end">
+            <x-secondary-button x-on:click="$dispatch('close')">
+                {{ __('Cancel') }}
+            </x-secondary-button>
+
+            <x-danger-button type="submit" class="ms-3">
+                {{ __('Delete Account') }}
+            </x-danger-button>
+        </div>
+    </form>
+</x-modal>
 </section>
