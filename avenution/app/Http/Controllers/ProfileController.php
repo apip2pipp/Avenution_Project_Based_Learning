@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Hash;
+
 
 class ProfileController extends Controller
 {
@@ -56,11 +58,14 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
-        ]);
-
         $user = $request->user();
+
+        // 🔥 HANYA validasi kalau user punya password
+        if ($user->password) {
+            $request->validateWithBag('userDeletion', [
+                'password' => ['required', 'current_password'],
+            ]);
+        }
 
         Auth::logout();
 
@@ -74,5 +79,42 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    public function updatePassword(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        // 🔵 GOOGLE USER (BELUM PUNYA PASSWORD)
+        if (!$user->password) {
+
+            $request->validate([
+                'new_password' => ['required', 'min:6', 'confirmed'],
+            ]);
+
+            $user->update([
+                'password' => Hash::make($request->new_password)
+            ]);
+
+            return back()->with('success', 'Password berhasil dibuat');
+        }
+
+        // 🟢 USER SUDAH PUNYA PASSWORD
+        $request->validate([
+            'current_password' => ['required'],
+            'new_password' => ['required', 'min:6', 'confirmed'],
+        ]);
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors([
+                'current_password' => 'Password lama salah'
+            ]);
+        }
+
+        $user->update([
+            'password' => Hash::make($request->new_password)
+        ]);
+
+        return back()->with('success', 'Password berhasil diupdate');
     }
 }
