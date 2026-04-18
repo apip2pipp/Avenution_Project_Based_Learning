@@ -29,7 +29,8 @@
                     <li><a href="{{ route('home') }}" class="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">Home</a></li>
                     <li><a href="{{ route('analyze') }}" class="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">Analyze</a></li>
                     @auth
-                    <li><a href="{{ route('dashboard') }}" class="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">Dashboard</a></li>
+                    <li><a href="{{ route('history') }}" class="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">History</a></li>
+                    <li><a href="{{ route('profile.edit') }}" class="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">Profile</a></li>
                     @else
                     <li><a href="{{ route('login') }}" class="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">Login</a></li>
                     <li><a href="{{ route('register') }}" class="text-gray-600 dark:text-gray-400 hover:text-primary text-sm">Register</a></li>

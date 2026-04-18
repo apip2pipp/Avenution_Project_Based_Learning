@@ -1,4 +1,4 @@
-<nav class="sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-[#0F172A]/80 backdrop-blur-md" x-data="{ mobileOpen: false, darkMode: document.documentElement.classList.contains('dark') }">
+<nav class="sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-[#0F172A]/80 backdrop-blur-md" x-data="{ mobileOpen: false, darkMode: localStorage.getItem('darkMode') === 'true' }">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
             <!-- Logo -->
@@ -24,9 +24,18 @@
                     Analyze
                 </a>
                 @auth
-                    <a href="{{ auth()->user()->hasRole('admin') ? route('admin.dashboard') : route('dashboard') }}" class="text-gray-600 dark:text-gray-300 hover:text-primary transition-colors text-sm font-medium">
-                        Dashboard
-                    </a>
+                    @if(auth()->user()->hasRole('admin'))
+                        <a href="{{ route('admin.dashboard') }}" class="text-gray-600 dark:text-gray-300 hover:text-primary transition-colors text-sm font-medium">
+                            Admin Dashboard
+                        </a>
+                    @else
+                        <a href="{{ route('history') }}" class="text-gray-600 dark:text-gray-300 hover:text-primary transition-colors text-sm font-medium">
+                            History
+                        </a>
+                        <a href="{{ route('profile.edit') }}" class="text-gray-600 dark:text-gray-300 hover:text-primary transition-colors text-sm font-medium">
+                            Profile
+                        </a>
+                    @endif
                     <form method="POST" action="{{ route('logout') }}" class="inline">
                         @csrf
                         <button type="submit" class="px-4 py-2 rounded-xl border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-sm font-medium">
@@ -43,7 +52,7 @@
             <!-- Right side -->
             <div class="flex items-center gap-3">
                 <!-- Dark Mode Toggle -->
-                <button @click="darkMode = !darkMode; document.documentElement.classList.toggle('dark', darkMode)" class="w-9 h-9 rounded-lg flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                <button @click="darkMode = !darkMode; document.documentElement.classList.toggle('dark', darkMode); localStorage.setItem('darkMode', darkMode)" class="w-9 h-9 rounded-lg flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                     <svg x-show="!darkMode" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
                     </svg>
@@ -70,7 +79,12 @@
         <a href="{{ route('home') }}#features" class="block py-2 text-gray-600 dark:text-gray-300 text-sm font-medium">Features</a>
         <a href="{{ route('analyze') }}" class="block py-2 text-gray-600 dark:text-gray-300 text-sm font-medium">Analyze</a>
         @auth
-            <a href="{{ auth()->user()->hasRole('admin') ? route('admin.dashboard') : route('dashboard') }}" class="block py-2 text-gray-600 dark:text-gray-300 text-sm font-medium">Dashboard</a>
+            @if(auth()->user()->hasRole('admin'))
+                <a href="{{ route('admin.dashboard') }}" class="block py-2 text-gray-600 dark:text-gray-300 text-sm font-medium">Admin Dashboard</a>
+            @else
+                <a href="{{ route('history') }}" class="block py-2 text-gray-600 dark:text-gray-300 text-sm font-medium">History</a>
+                <a href="{{ route('profile.edit') }}" class="block py-2 text-gray-600 dark:text-gray-300 text-sm font-medium">Profile</a>
+            @endif
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="block py-2 text-primary text-sm font-medium">Logout</button>

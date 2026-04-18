@@ -21,38 +21,31 @@
     </head>
     <body class="font-sans antialiased bg-[#F9FAFB] dark:bg-[#0F172A] text-gray-900 dark:text-gray-100 transition-colors duration-200">
         <div class="min-h-screen">
-            @include('layouts.navigation')
+            @include('components.navbar')
 
-            <!-- Flash Messages -->
-            @if (session('success'))
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-                    <div class="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-200 px-4 py-3 rounded-xl">
+            <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+                @isset($header)
+                    <header class="mb-8 border-b border-slate-200/70 pb-6 dark:border-slate-800/80">
+                        {{ $header }}
+                    </header>
+                @endisset
+
+                @if (session('success'))
+                    <div class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-800 shadow-sm dark:border-emerald-900/40 dark:bg-emerald-900/20 dark:text-emerald-200">
                         {{ session('success') }}
                     </div>
-                </div>
-            @endif
+                @endif
 
-            @if (session('error'))
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-                    <div class="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200 px-4 py-3 rounded-xl">
+                @if (session('error'))
+                    <div class="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-red-800 shadow-sm dark:border-red-900/40 dark:bg-red-900/20 dark:text-red-200">
                         {{ session('error') }}
                     </div>
-                </div>
-            @endif
+                @endif
 
-            <!-- Page Heading -->
-            @if (isset($header))
-                <header class="bg-white dark:bg-gray-800/60 shadow-sm">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-            @endif
-
-            <!-- Page Content -->
-            <main>
                 {{ $slot }}
-            </main>
+            </div>
+
+            @include('components.footer')
         </div>
     </body>
 </html>
