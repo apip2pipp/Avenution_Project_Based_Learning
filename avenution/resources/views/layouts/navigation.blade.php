@@ -14,7 +14,7 @@
                             <span class="font-bold text-gray-800 dark:text-white">Avenution</span>
                         </a>
                     @else
-                        <a href="{{ route('dashboard') }}" class="flex items-center gap-2">
+                        <a href="{{ route('analyze') }}" class="flex items-center gap-2">
                             <img src="{{ asset('images/lightmode.png') }}" 
                                 class="block dark:hidden h-8 w-auto">
                             <img src="{{ asset('images/darkmode.png') }}" 
@@ -34,8 +34,14 @@
                             🍽️ {{ __('Manage Foods') }}
                         </x-nav-link>
                     @else
-                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                            {{ __('Dashboard') }}
+                        <x-nav-link :href="route('analyze')" :active="request()->routeIs('analyze')">
+                            {{ __('Analyze') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('history')" :active="request()->routeIs('history')">
+                            {{ __('History') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.*')">
+                            {{ __('Profile') }}
                         </x-nav-link>
                     @endif
                 </div>
@@ -98,8 +104,14 @@
                     🍽️ {{ __('Manage Foods') }}
                 </x-responsive-nav-link>
             @else
-                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                    {{ __('Dashboard') }}
+                <x-responsive-nav-link :href="route('analyze')" :active="request()->routeIs('analyze')">
+                    {{ __('Analyze') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('history')" :active="request()->routeIs('history')">
+                    {{ __('History') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('profile.edit')" :active="request()->routeIs('profile.*')">
+                    {{ __('Profile') }}
                 </x-responsive-nav-link>
             @endif
         </div>
