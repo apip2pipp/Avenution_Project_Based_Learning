@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -31,6 +32,7 @@ class User extends Authenticatable
         'height',
         'weight',
         'phone',
+        'profile_photo_path',
     ];
 
     /**
@@ -59,5 +61,14 @@ class User extends Authenticatable
     public function analyses()
     {
         return $this->hasMany(Analysis::class);
+    }
+
+    public function getProfilePhotoUrlAttribute(): ?string
+    {
+        if ($this->profile_photo_path) {
+            return Storage::url($this->profile_photo_path);
+        }
+
+        return $this->google_avatar;
     }
 }
