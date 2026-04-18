@@ -53,6 +53,10 @@ class AuthenticatedSessionController extends Controller
                 ->with('status', 'Google account linked successfully.');
         }
 
+        if ($user && $user->hasRole('admin')) {
+            return redirect()->route('admin.dashboard');
+        }
+
         return redirect()->intended(RouteServiceProvider::HOME);
     }
 
