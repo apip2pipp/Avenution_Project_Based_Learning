@@ -20,7 +20,7 @@
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     </head>
     <body class="font-sans antialiased bg-[#F9FAFB] dark:bg-[#0F172A] text-gray-900 dark:text-gray-100 transition-colors duration-200">
-        <div class="min-h-screen">
+        <div class="min-h-screen pt-16">
             @include('components.navbar')
 
             <!-- Flash Messages -->

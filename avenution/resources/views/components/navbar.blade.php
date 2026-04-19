@@ -1,4 +1,8 @@
-<nav class="sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-[#0F172A]/80 backdrop-blur-md" x-data="{ mobileOpen: false, darkMode: localStorage.getItem('darkMode') === 'true' }">
+@php
+    $featuresHref = request()->routeIs('home') ? '#features' : route('home');
+@endphp
+
+<nav class="fixed inset-x-0 top-0 z-50 border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-[#0F172A]/80 backdrop-blur-md" x-data="{ mobileOpen: false, darkMode: localStorage.getItem('darkMode') === 'true' }">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
             <!-- Logo -->
@@ -17,7 +21,7 @@
 
             <!-- Desktop Nav -->
             <div class="hidden md:flex items-center gap-8">
-                <a href="{{ route('home') }}#features" class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light transition-colors text-sm font-medium">
+                <a href="{{ $featuresHref }}" class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light transition-colors text-sm font-medium">
                     Features
                 </a>
                 <a href="{{ route('analyze') }}" class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light transition-colors text-sm font-medium">
@@ -76,7 +80,7 @@
 
     <!-- Mobile Menu -->
     <div x-show="mobileOpen" x-transition class="md:hidden border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-[#0F172A] px-4 py-3 space-y-2">
-        <a href="{{ route('home') }}#features" class="block py-2 text-gray-600 dark:text-gray-300 text-sm font-medium">Features</a>
+        <a href="{{ $featuresHref }}" class="block py-2 text-gray-600 dark:text-gray-300 text-sm font-medium">Features</a>
         <a href="{{ route('analyze') }}" class="block py-2 text-gray-600 dark:text-gray-300 text-sm font-medium">Analyze</a>
         @auth
             @if(auth()->user()->hasRole('admin'))

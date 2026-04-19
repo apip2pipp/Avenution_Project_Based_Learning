@@ -267,4 +267,19 @@
             </a>
         </div>
     </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var analyzeUrl = @json(route('analyze'));
+            var isFromAnalyze = document.referrer && document.referrer.indexOf(analyzeUrl) === 0;
+
+            if (isFromAnalyze) {
+                window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+
+                if (window.location.hash === '#features' && window.history.replaceState) {
+                    window.history.replaceState(null, '', window.location.pathname + window.location.search);
+                }
+            }
+        });
+    </script>
 </x-guest-layout>
