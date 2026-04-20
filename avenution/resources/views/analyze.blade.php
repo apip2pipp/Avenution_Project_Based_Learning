@@ -11,17 +11,17 @@
                 </p>
             </div>
 
-            <!-- Demo Data Buttons -->
+            <!-- Example Data Buttons -->
             <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl p-6 mb-8 border border-blue-200 dark:border-blue-800">
                 <div class="flex items-center gap-2 mb-4">
                     <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
                     </svg>
-                    <h3 class="font-semibold text-gray-900 dark:text-white">Quick Demo Data</h3>
-                    <span class="text-xs text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/50 px-2 py-1 rounded-full">Click to auto-fill form</span>
+                    <h3 class="font-semibold text-gray-900 dark:text-white">Example Profiles</h3>
+                    <span class="text-xs text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/50 px-2 py-1 rounded-full">Click to compare profile differences</span>
                 </div>
                 <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-                    <!-- Demo 1: Healthy & Normal -->
+                    <!-- Example 1: Healthy & Normal -->
                     <button type="button" onclick="fillDemoData('healthy')" class="demo-btn bg-green-100 hover:bg-green-200 dark:bg-green-900/30 dark:hover:bg-green-900/50 border border-green-300 dark:border-green-700 rounded-xl p-3 text-left transition-all hover:scale-105 hover:shadow-md min-h-[90px] flex flex-col justify-between">
                         <div class="mb-1">
                             <div class="text-2xl mb-1">✅</div>
@@ -30,7 +30,7 @@
                         <p class="text-xs text-green-700 dark:text-green-400 leading-tight">Normal BMI, Active</p>
                     </button>
 
-                    <!-- Demo 2: Overweight -->
+                    <!-- Example 2: Overweight -->
                     <button type="button" onclick="fillDemoData('overweight')" class="demo-btn bg-orange-100 hover:bg-orange-200 dark:bg-orange-900/30 dark:hover:bg-orange-900/50 border border-orange-300 dark:border-orange-700 rounded-xl p-3 text-left transition-all hover:scale-105 hover:shadow-md min-h-[90px] flex flex-col justify-between">
                         <div class="mb-1">
                             <div class="text-2xl mb-1">⚠️</div>
@@ -39,7 +39,7 @@
                         <p class="text-xs text-orange-700 dark:text-orange-400 leading-tight">High BMI, Sedentary</p>
                     </button>
 
-                    <!-- Demo 3: Hypertension -->
+                    <!-- Example 3: Hypertension -->
                     <button type="button" onclick="fillDemoData('hypertension')" class="demo-btn bg-red-100 hover:bg-red-200 dark:bg-red-900/30 dark:hover:bg-red-900/50 border border-red-300 dark:border-red-700 rounded-xl p-3 text-left transition-all hover:scale-105 hover:shadow-md min-h-[90px] flex flex-col justify-between">
                         <div class="mb-1">
                             <div class="text-2xl mb-1">🩺</div>
@@ -48,7 +48,7 @@
                         <p class="text-xs text-red-700 dark:text-red-400 leading-tight">High Blood Pressure</p>
                     </button>
 
-                    <!-- Demo 4: Diabetes Risk -->
+                    <!-- Example 4: Diabetes Risk -->
                     <button type="button" onclick="fillDemoData('diabetes')" class="demo-btn bg-purple-100 hover:bg-purple-200 dark:bg-purple-900/30 dark:hover:bg-purple-900/50 border border-purple-300 dark:border-purple-700 rounded-xl p-3 text-left transition-all hover:scale-105 hover:shadow-md min-h-[90px] flex flex-col justify-between">
                         <div class="mb-1">
                             <div class="text-2xl mb-1">💉</div>
@@ -57,7 +57,7 @@
                         <p class="text-xs text-purple-700 dark:text-purple-400 leading-tight">High Blood Sugar</p>
                     </button>
 
-                    <!-- Demo 5: Underweight -->
+                    <!-- Example 5: Underweight -->
                     <button type="button" onclick="fillDemoData('underweight')" class="demo-btn bg-yellow-100 hover:bg-yellow-200 dark:bg-yellow-900/30 dark:hover:bg-yellow-900/50 border border-yellow-300 dark:border-yellow-700 rounded-xl p-3 text-left transition-all hover:scale-105 hover:shadow-md min-h-[90px] flex flex-col justify-between">
                         <div class="mb-1">
                             <div class="text-2xl mb-1">📉</div>
