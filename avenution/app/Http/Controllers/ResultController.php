@@ -28,6 +28,12 @@ class ResultController extends Controller
             ->with(['recommendations.food'])
             ->firstOrFail();
 
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+        if (! $user->hasRole('admin') && (int) $analysis->user_id !== (int) $user->id) {
+            abort(403, 'You are not authorized to view this analysis result.');
+        }
+
         // Self-heal old analyses that were created while foods data was empty.
         if ($analysis->recommendations->isEmpty() && Food::query()->exists()) {
             $recommendations = $this->recommendationService->generateRecommendations($analysis);

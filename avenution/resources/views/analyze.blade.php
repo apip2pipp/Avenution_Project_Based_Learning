@@ -9,6 +9,9 @@
                 <p class="text-gray-600 dark:text-gray-400 text-lg">
                     Enter your health information to get personalized food recommendations
                 </p>
+                <p class="mt-3 text-sm text-gray-500 dark:text-gray-400">
+                    Submit your data first, then you will be asked to login or register before the recommendation is generated and saved to your history.
+                </p>
             </div>
 
             <!-- Example Data Buttons -->

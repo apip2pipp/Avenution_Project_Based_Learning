@@ -4,7 +4,11 @@ namespace Tests\Feature;
 
 use App\Models\Analysis;
 use App\Models\User;
+use App\Services\PendingAnalysisService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
@@ -77,6 +81,99 @@ class AnalysisFlowTest extends TestCase
         $this->actingAs($user)
             ->get(route('result.show', $analysis->session_id))
             ->assertOk();
+    }
+
+    public function test_guest_analyze_payload_is_processed_after_real_registration_flow(): void
+    {
+        $payload = $this->validAnalyzePayload();
+
+        $this->post('/analyze', $payload)
+            ->assertRedirect(route('login'));
+
+        $response = $this->post('/register', [
+            'name' => 'Real Flow Member',
+            'email' => 'realflow@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ]);
+
+        $user = User::query()->where('email', 'realflow@example.com')->first();
+        $analysis = Analysis::query()->where('user_id', $user->id)->latest('id')->first();
+
+        $this->assertNotNull($analysis);
+        $response->assertRedirect(route('result.show', $analysis->session_id));
+    }
+
+    public function test_pending_payload_cache_fallback_is_processed_after_login(): void
+    {
+        $payload = $this->validAnalyzePayload();
+        $pendingToken = (string) Str::uuid();
+
+        Cache::put('pending_analysis:' . $pendingToken, $payload, now()->addMinutes(10));
+
+        $user = User::factory()->create([
+            'username' => 'cache-member',
+            'email_verified_at' => now(),
+        ]);
+
+        $response = $this->withSession([
+            'pending_analysis_token' => $pendingToken,
+        ])->post('/login', [
+            'login' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $analysis = Analysis::query()->where('user_id', $user->id)->latest('id')->first();
+
+        $response->assertRedirect();
+        $this->assertNotNull($analysis);
+        $this->assertFalse(Cache::has('pending_analysis:' . $pendingToken));
+    }
+
+    public function test_pending_payload_cache_fallback_is_processed_after_registration(): void
+    {
+        $payload = $this->validAnalyzePayload();
+        $pendingToken = (string) Str::uuid();
+
+        Cache::put('pending_analysis:' . $pendingToken, $payload, now()->addMinutes(10));
+
+        $response = $this->withSession([
+            'pending_analysis_token' => $pendingToken,
+        ])->post('/register', [
+            'name' => 'Cache Member',
+            'email' => 'cachemember@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ]);
+
+        $user = User::query()->where('email', 'cachemember@example.com')->first();
+        $analysis = Analysis::query()->where('user_id', $user->id)->latest('id')->first();
+
+        $response->assertRedirect();
+        $this->assertNotNull($analysis);
+        $this->assertFalse(Cache::has('pending_analysis:' . $pendingToken));
+    }
+
+    public function test_pending_payload_can_be_restored_from_oauth_state_token(): void
+    {
+        Route::middleware('web')->get('/testing/pending-analysis-pull', function (Request $request, PendingAnalysisService $pendingAnalysisService) {
+            return response()->json([
+                'payload' => $pendingAnalysisService->pull($request),
+            ]);
+        });
+
+        $payload = $this->validAnalyzePayload();
+        $pendingToken = (string) Str::uuid();
+        $state = app(PendingAnalysisService::class)->oauthState($pendingToken);
+
+        Cache::put('pending_analysis:' . $pendingToken, $payload, now()->addMinutes(10));
+
+        $this->get('/testing/pending-analysis-pull?state='.urlencode($state))
+            ->assertOk()
+            ->assertJsonPath('payload.age', $payload['age'])
+            ->assertJsonPath('payload.goal', $payload['goal']);
+
+        $this->assertFalse(Cache::has('pending_analysis:' . $pendingToken));
     }
 
     public function test_user_cannot_access_other_users_result_page(): void
