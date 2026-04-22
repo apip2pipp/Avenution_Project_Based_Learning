@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 use Illuminate\View\View;
 use Throwable;
@@ -31,6 +30,15 @@ class PasswordResetLinkController extends Controller
             'email' => ['required', 'email'],
         ]);
 
+        $usingLocalMailpitHost = app()->isLocal()
+            && config('mail.default') === 'smtp'
+            && config('mail.mailers.smtp.host') === 'mailpit';
+
+        if ($usingLocalMailpitHost) {
+            // Prevent SMTP host errors on local machines that do not run Mailpit.
+            config(['mail.default' => 'log']);
+        }
+
         try {
             // We will send the password reset link to this user. Once we have attempted
             // to send the link, we will examine the response then see the message we
@@ -40,29 +48,18 @@ class PasswordResetLinkController extends Controller
             );
 
             return $status == Password::RESET_LINK_SENT
-                        ? back()->with('status', __($status))
+                        ? back()->with('status', $usingLocalMailpitHost
+                            ? 'Reset link generated. Check storage/logs/laravel.log (local development mode).'
+                            : __($status))
                         : back()->withInput($request->only('email'))
                                 ->withErrors(['email' => __($status)]);
         } catch (Throwable $exception) {
-            if (! app()->isLocal()) {
-                throw $exception;
-            }
+            report($exception);
 
-            Log::warning('Primary password reset mail transport failed. Retrying with log mailer.', [
-                'email' => $request->string('email')->toString(),
-                'reason' => $exception->getMessage(),
-            ]);
-
-            config(['mail.default' => 'log']);
-
-            $fallbackStatus = Password::sendResetLink(
-                $request->only('email')
-            );
-
-            return $fallbackStatus == Password::RESET_LINK_SENT
-                        ? back()->with('status', 'Reset link created for local testing. Check storage/logs/laravel.log.')
-                        : back()->withInput($request->only('email'))
-                                ->withErrors(['email' => __($fallbackStatus)]);
+            return back()->withInput($request->only('email'))
+                ->withErrors([
+                    'email' => 'Unable to send reset email right now. Please check mail configuration and try again.',
+                ]);
         }
     }
 }
