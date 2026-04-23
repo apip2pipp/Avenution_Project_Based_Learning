@@ -6,6 +6,7 @@ use App\Http\Controllers\AnalyzeController;
 use App\Http\Controllers\ResultController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HistoryController;
+use App\Http\Controllers\Admin\AnalysisExportController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\FoodController;
 use App\Http\Controllers\Admin\UserController;
@@ -20,7 +21,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/analyze', [AnalyzeController::class, 'index'])->name('analyze');
 Route::post('/analyze', [AnalyzeController::class, 'analyze'])->name('analyze.post');
-Route::get('/result/{sessionId}', [ResultController::class, 'show'])->name('result.show');
+Route::get('/result/{sessionId}', [ResultController::class, 'show'])
+    ->middleware('auth')
+    ->name('result.show');
 
 /*
 |--------------------------------------------------------------------------
@@ -36,6 +39,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])
         ->name('profile.destroy');
+    Route::delete('/profile/reset-test-account', [ProfileController::class, 'destroy'])
+        ->name('profile.reset-test-account');
     
     Route::post('/profile/password', [ProfileController::class, 'updatePassword'])
     ->middleware('auth')
@@ -50,6 +55,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/analyses/export', [AnalysisExportController::class, 'download'])->name('analyses.export');
     
     // Food Management
     Route::get('foods/import', [FoodController::class, 'importForm'])->name('foods.import.form');
