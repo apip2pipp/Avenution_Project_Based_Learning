@@ -1,18 +1,18 @@
 <section class="space-y-6">
     <header>
         <h2 class="text-xl font-bold text-red-700 dark:text-red-400">
-            {{ __('Delete Account') }}
+            {{ __('Delete / Reset Test Account') }}
         </h2>
 
         <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">
-            {{ __('Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.') }}
+            {{ __('This will delete your local account, analyses, recommendations, and history. After that, you can sign in again with the same Google account and it will be created as a fresh user.') }}
         </p>
     </header>
 
     <x-danger-button
         x-data=""
         x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')"
-    >{{ __('Delete Account') }}</x-danger-button>
+    >{{ __('Reset Test Account') }}</x-danger-button>
 
     
 <x-modal 
@@ -20,16 +20,16 @@
     :show="auth()->user()->password && $errors->userDeletion->isNotEmpty()" 
     focusable>
     
-    <form method="post" action="{{ route('profile.destroy') }}" class="p-6">
+    <form method="post" action="{{ route('profile.reset-test-account') }}" class="p-6">
         @csrf
         @method('delete')
 
         <h2 class="text-lg font-semibold text-slate-900 dark:text-white">
-            {{ __('Are you sure you want to delete your account?') }}
+            {{ __('Are you sure you want to reset this test account?') }}
         </h2>
 
         <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">
-            {{ __('Once your account is deleted, all of its resources and data will be permanently deleted.') }}
+            {{ __('Your local login record, analysis history, and recommendations will be removed. You can then log in again with the same Google account as a new user.') }}
         </p>
 
         {{-- 🔥 CONDITIONAL --}}
@@ -67,7 +67,7 @@
             </x-secondary-button>
 
             <x-danger-button type="submit" class="ms-3">
-                {{ __('Delete Account') }}
+                {{ __('Reset Test Account') }}
             </x-danger-button>
         </div>
     </form>
