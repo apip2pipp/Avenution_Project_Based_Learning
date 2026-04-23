@@ -1,11 +1,19 @@
-<x-guest-layout>
+<x-app-layout>
     <x-slot name="title">Analysis Results</x-slot>
+
+    <x-slot name="header">
+        <div>
+            <p class="text-sm font-medium uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">Analysis Result</p>
+            <h1 class="mt-2 text-3xl font-bold text-slate-950 dark:text-white">Your Health Analysis</h1>
+            <p class="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-400">
+                This result is now linked to your account and saved in your history.
+            </p>
+        </div>
+    </x-slot>
 
     <div class="py-12">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Header -->
             <div class="text-center mb-12">
-                <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">Your Health Analysis</h1>
                 <p class="text-gray-600 dark:text-gray-400">
                     Analysis completed on {{ $analysis->created_at->format('F j, Y') }}
                 </p>
@@ -138,24 +146,6 @@
                 @endif
             </div>
 
-            <!-- CTA for Guest Users -->
-            @guest
-                <div class="mt-8 bg-gradient-to-br from-primary/10 to-accent/10 dark:from-primary/20 dark:to-accent/20 rounded-2xl p-8 text-center">
-                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Want to save these results?</h3>
-                    <p class="text-gray-600 dark:text-gray-400 mb-6">
-                        Create an account to track your health progress and access your history anytime.
-                    </p>
-                    <div class="flex flex-wrap gap-4 justify-center">
-                        <a href="{{ route('register') }}" class="px-6 py-3 bg-primary hover:bg-primary-dark text-white rounded-xl font-semibold transition-all duration-200">
-                            Create Free Account
-                        </a>
-                        <a href="{{ route('login') }}" class="px-6 py-3 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200">
-                            Login
-                        </a>
-                    </div>
-                </div>
-            @endguest
-
             <!-- Back Button -->
             <div class="mt-8 text-center">
                 <a href="{{ route('analyze') }}" class="inline-flex items-center gap-2 text-primary hover:text-primary-dark dark:text-primary-light font-medium">
@@ -167,4 +157,4 @@
             </div>
         </div>
     </div>
-</x-guest-layout>
+</x-app-layout>
