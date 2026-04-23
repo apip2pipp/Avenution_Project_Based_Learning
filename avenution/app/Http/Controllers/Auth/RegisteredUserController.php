@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
+use App\Services\AnalysisProcessingService;
+use App\Services\PendingAnalysisService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,6 +17,12 @@ use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
+    public function __construct(
+        protected AnalysisProcessingService $analysisProcessingService,
+        protected PendingAnalysisService $pendingAnalysisService
+    ) {
+    }
+
     /**
      * Display the registration view.
      */
@@ -45,6 +53,16 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
         Auth::login($user);
+
+        $pendingAnalysisPayload = $this->pendingAnalysisService->pull($request);
+
+        if ($pendingAnalysisPayload) {
+            $analysis = $this->analysisProcessingService->process($pendingAnalysisPayload, $user);
+
+            return redirect()
+                ->route('result.show', ['sessionId' => $analysis->session_id])
+                ->with('success', 'Analysis completed successfully!');
+        }
 
         return redirect(RouteServiceProvider::HOME);
     }
