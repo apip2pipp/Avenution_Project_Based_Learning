@@ -87,6 +87,19 @@
                 </div>
             </a>
 
+            <a href="{{ route('admin.analyses.export') }}" class="group rounded-[1.75rem] border border-slate-200/80 bg-white p-6 shadow-sm transition-transform hover:-translate-y-1 dark:border-slate-800 dark:bg-slate-900">
+                <div class="flex items-start justify-between gap-4">
+                    <div>
+                        <p class="text-sm font-medium uppercase tracking-[0.25em] text-slate-500 dark:text-slate-400">Export Analyses</p>
+                        <h3 class="mt-3 text-2xl font-bold text-slate-950 dark:text-white">Download Excel report</h3>
+                        <p class="mt-3 max-w-xl text-sm leading-6 text-slate-600 dark:text-slate-400">Export every analysis row with user identity, health metrics, lifestyle data, BMI, and recommendation summary.</p>
+                    </div>
+                    <span class="rounded-2xl bg-slate-950 px-4 py-3 text-white transition-colors group-hover:bg-emerald-600">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v8m0 0l-3-3m3 3l3-3m-9 8h12"></path></svg>
+                    </span>
+                </div>
+            </a>
+
             <a href="{{ route('admin.users.index') }}" class="group rounded-[1.75rem] border border-slate-200/80 bg-white p-6 shadow-sm transition-transform hover:-translate-y-1 dark:border-slate-800 dark:bg-slate-900">
                 <div class="flex items-start justify-between gap-4">
                     <div>
