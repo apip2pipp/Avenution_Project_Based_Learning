@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,11 +16,14 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!auth()->check()) {
+        /** @var User|null $user */
+        $user = $request->user();
+
+        if (! $user) {
             return redirect('/login')->with('error', 'Please login to continue.');
         }
 
-        if (!auth()->user()->hasRole('admin')) {
+        if (! $user->hasRole('admin')) {
             abort(403, 'Unauthorized. Admin access required.');
         }
 
