@@ -21,7 +21,7 @@
 
             <!-- Desktop Nav -->
             <div class="hidden md:flex items-center gap-8">
-                <a href="{{ $featuresHref }}" class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light transition-colors text-sm font-medium">
+                <a href="{{ route('home') }}" class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light transition-colors text-sm font-medium">
                     Features
                 </a>
                 <a href="{{ route('analyze') }}" class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light transition-colors text-sm font-medium">
