@@ -7,26 +7,34 @@
         <div class="flex items-center justify-between h-16">
             <!-- Logo -->
             <a href="{{ route('home') }}" class="flex items-center gap-2">
-                    <div class="w-8 h-8 flex items-center justify-center">
-                        <!-- Logo Light -->
-                        <img src="{{ asset('images/lightmode.png') }}" 
-                            class="block dark:hidden w-full h-full object-contain">
-
-                        <!-- Logo Dark -->
-                        <img src="{{ asset('images/darkmode.png') }}" 
-                            class="hidden dark:block w-full h-full object-contain">
-                    </div>
+                <div class="w-8 h-8 flex items-center justify-center">
+                    <img src="{{ asset('images/lightmode.png') }}" class="block dark:hidden w-full h-full object-contain">
+                    <img src="{{ asset('images/darkmode.png') }}" class="hidden dark:block w-full h-full object-contain">
+                </div>
                 <span class="text-gray-900 dark:text-white font-bold text-xl">Avenution</span>
             </a>
 
             <!-- Desktop Nav -->
             <div class="hidden md:flex items-center gap-8">
-                <a href="{{ route('home') }}" class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light transition-colors text-sm font-medium">
-                    Features
-                </a>
+
+                {{-- ✅ INI SATU-SATUNYA YANG DIUBAH --}}
+                @guest
+                    <a href="{{ route('home') }}" class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light transition-colors text-sm font-medium">
+                        Features
+                    </a>
+                @else
+                    @if(auth()->user()->hasRole('admin'))
+                        <a href="{{ route('home') }}" class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light transition-colors text-sm font-medium">
+                            Features
+                        </a>
+                    @endif
+                @endguest
+
+                {{-- LAINNYA 100% SAMA --}}
                 <a href="{{ route('analyze') }}" class="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary-light transition-colors text-sm font-medium">
                     Analyze
                 </a>
+
                 @auth
                     @if(auth()->user()->hasRole('admin'))
                         <a href="{{ route('admin.dashboard') }}" class="text-gray-600 dark:text-gray-300 hover:text-primary transition-colors text-sm font-medium">
@@ -80,8 +88,18 @@
 
     <!-- Mobile Menu -->
     <div x-show="mobileOpen" x-transition class="md:hidden border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-[#0F172A] px-4 py-3 space-y-2">
-        <a href="{{ $featuresHref }}" class="block py-2 text-gray-600 dark:text-gray-300 text-sm font-medium">Features</a>
+
+        {{-- ✅ INI JUGA DOANG YANG DIUBAH --}}
+        @guest
+            <a href="{{ $featuresHref }}" class="block py-2 text-gray-600 dark:text-gray-300 text-sm font-medium">Features</a>
+        @else
+            @if(auth()->user()->hasRole('admin'))
+                <a href="{{ $featuresHref }}" class="block py-2 text-gray-600 dark:text-gray-300 text-sm font-medium">Features</a>
+            @endif
+        @endguest
+
         <a href="{{ route('analyze') }}" class="block py-2 text-gray-600 dark:text-gray-300 text-sm font-medium">Analyze</a>
+
         @auth
             @if(auth()->user()->hasRole('admin'))
                 <a href="{{ route('admin.dashboard') }}" class="block py-2 text-gray-600 dark:text-gray-300 text-sm font-medium">Admin Dashboard</a>
