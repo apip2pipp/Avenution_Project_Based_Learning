@@ -59,6 +59,8 @@ return [
 
     'asset_url' => env('ASSET_URL'),
 
+    'show_demo_access' => (bool) env('SHOW_DEMO_ACCESS', false),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

@@ -100,6 +100,7 @@
                 <x-password-input 
                     name="password" 
                     id="password"
+                    model="password"
                     placeholder="Enter your password"
                     :showForgotPassword="true"
                     required
@@ -124,29 +125,31 @@
             </button>
         </form>
 
-        <!-- Demo credentials -->
-        <div class="mt-5 p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-dashed border-gray-200 dark:border-gray-700">
-            <p class="text-xs text-gray-400 dark:text-gray-500 font-medium mb-2.5 flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-green-400 inline-block"></span>
-                Quick Demo Access
-            </p>
-            <div class="flex gap-2.5">
-                <button 
-                    type="button"
-                    @click="fillDemo('user')"
-                    class="flex-1 py-2 text-xs font-semibold rounded-lg bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500 transition-colors"
-                >
-                    👤 Demo User
-                </button>
-                <button 
-                    type="button"
-                    @click="fillDemo('admin')"
-                    class="flex-1 py-2 text-xs font-semibold rounded-lg bg-[#C62828]/10 border border-[#C62828]/25 text-[#C62828] hover:bg-[#C62828]/15 transition-colors"
-                >
-                    🔑 Demo Admin
-                </button>
+        @if (config('app.show_demo_access'))
+            <!-- Demo credentials (local only) -->
+            <div class="mt-5 p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-dashed border-gray-200 dark:border-gray-700">
+                <p class="text-xs text-gray-400 dark:text-gray-500 font-medium mb-2.5 flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-400 inline-block"></span>
+                    Quick Demo Access
+                </p>
+                <div class="flex gap-2.5">
+                    <button 
+                        type="button"
+                        @click="fillDemo('user')"
+                        class="flex-1 py-2 text-xs font-semibold rounded-lg bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500 transition-colors"
+                    >
+                        👤 Demo User
+                    </button>
+                    <button 
+                        type="button"
+                        @click="fillDemo('admin')"
+                        class="flex-1 py-2 text-xs font-semibold rounded-lg bg-[#C62828]/10 border border-[#C62828]/25 text-[#C62828] hover:bg-[#C62828]/15 transition-colors"
+                    >
+                        🔑 Demo Admin
+                    </button>
+                </div>
             </div>
-        </div>
+        @endif
 
         <!-- Switch mode -->
         <p class="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">

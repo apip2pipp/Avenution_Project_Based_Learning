@@ -1,6 +1,8 @@
-@props(['disabled' => false, 'name', 'id', 'value' => '', 'placeholder' => '', 'showStrength' => false, 'showForgotPassword' => false])
+@props(['disabled' => false, 'name', 'id', 'value' => '', 'placeholder' => '', 'showStrength' => false, 'showForgotPassword' => false, 'model' => null])
 
-<div x-data="{ show: false, password: '{{ $value }}' }">
+@php($passwordBinding = $model ?: 'internalPassword')
+
+<div x-data="{ show: false, internalPassword: '{{ $value }}' }">
     <div class="flex items-center justify-between mb-1.5">
         <label for="{{ $id }}" class="text-xs font-semibold text-gray-600 dark:text-gray-400">
             {{ $slot }}
@@ -17,7 +19,7 @@
         </svg>
         <input 
             :type="show ? 'text' : 'password'"
-            x-model="password"
+            x-model="{{ $passwordBinding }}"
             name="{{ $name }}"
             id="{{ $id }}"
             {{ $disabled ? 'disabled' : '' }}
@@ -40,21 +42,21 @@
     </div>
     
     @if($showStrength)
-    <div x-show="password.length > 0" class="mt-2" style="display: none;">
+    <div x-show="{{ $passwordBinding }}.length > 0" class="mt-2" style="display: none;">
         <div class="flex gap-1 mb-1">
             <div class="h-1 flex-1 rounded-full transition-all duration-300"
-                :class="password.length >= 6 ? (password.length >= 10 ? 'bg-green-500' : 'bg-yellow-500') : 'bg-red-500'">
+                :class="{{ $passwordBinding }}.length >= 6 ? ({{ $passwordBinding }}.length >= 10 ? 'bg-green-500' : 'bg-yellow-500') : 'bg-red-500'">
             </div>
             <div class="h-1 flex-1 rounded-full transition-all duration-300"
-                :class="password.length >= 10 ? 'bg-green-500' : (password.length >= 6 ? 'bg-yellow-500' : 'bg-gray-200 dark:bg-gray-700')">
+                :class="{{ $passwordBinding }}.length >= 10 ? 'bg-green-500' : ({{ $passwordBinding }}.length >= 6 ? 'bg-yellow-500' : 'bg-gray-200 dark:bg-gray-700')">
             </div>
             <div class="h-1 flex-1 rounded-full transition-all duration-300"
-                :class="password.length >= 10 ? 'bg-green-500' : 'bg-gray-200 dark:bg-gray-700'">
+                :class="{{ $passwordBinding }}.length >= 10 ? 'bg-green-500' : 'bg-gray-200 dark:bg-gray-700'">
             </div>
         </div>
         <p class="text-xs"
-            :class="password.length >= 10 ? 'text-green-500' : (password.length >= 6 ? 'text-yellow-500' : 'text-red-500')">
-            <span x-text="password.length >= 10 ? 'Strong' : (password.length >= 6 ? 'Fair' : 'Weak')"></span> password
+            :class="{{ $passwordBinding }}.length >= 10 ? 'text-green-500' : ({{ $passwordBinding }}.length >= 6 ? 'text-yellow-500' : 'text-red-500')">
+            <span x-text="{{ $passwordBinding }}.length >= 10 ? 'Strong' : ({{ $passwordBinding }}.length >= 6 ? 'Fair' : 'Weak')"></span> password
         </p>
     </div>
     @endif

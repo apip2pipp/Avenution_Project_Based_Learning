@@ -115,6 +115,7 @@
                 <x-password-input 
                     name="password" 
                     id="password"
+                    model="password"
                     placeholder="Min. 6 characters"
                     :showStrength="true"
                     required
