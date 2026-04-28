@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
+use RuntimeException;
 
 class AdminSeeder extends Seeder
 {
@@ -14,6 +15,12 @@ class AdminSeeder extends Seeder
      */
     public function run(): void
     {
+        $adminPassword = env('ADMIN_PASSWORD');
+
+        if (! $adminPassword) {
+            throw new RuntimeException('ADMIN_PASSWORD is not set.');
+        }
+
         $adminRole = Role::findOrCreate('admin', 'web');
         $userRole = Role::findOrCreate('user', 'web');
 
@@ -23,15 +30,17 @@ class AdminSeeder extends Seeder
             [
                 'name' => 'Admin Avenution',
                 'username' => 'admin',
-                'password' => Hash::make('password'),
+                'password' => Hash::make($adminPassword),
                 'email_verified_at' => now(),
             ]
         );
 
-        if (! $admin->username) {
-            $admin->username = 'admin';
-            $admin->save();
-        }
+        $admin->forceFill([
+            'name' => $admin->name ?: 'Admin Avenution',
+            'username' => 'admin',
+            'password' => Hash::make($adminPassword),
+            'email_verified_at' => $admin->email_verified_at ?? now(),
+        ])->save();
 
         $admin->syncRoles([$adminRole]);
         
@@ -50,10 +59,10 @@ class AdminSeeder extends Seeder
             ]
         );
 
-        if (! $user->username) {
-            $user->username = 'user';
-            $user->save();
-        }
+        $user->forceFill([
+            'username' => 'user',
+            'email_verified_at' => $user->email_verified_at ?? now(),
+        ])->save();
 
         $user->syncRoles([$userRole]);
     }
