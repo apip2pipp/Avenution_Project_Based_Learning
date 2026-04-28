@@ -12,7 +12,8 @@ class TrustProxies extends Middleware
      *
      * @var array<int, string>|string|null
      */
-    protected $proxies;
+    // Trust reverse proxies (ngrok, load balancers) so forwarded HTTPS is respected.
+    protected $proxies = '*';
 
     /**
      * The headers that should be used to detect proxies.
