@@ -32,10 +32,18 @@ class GoogleAuthController extends Controller
         return strlen($avatar) <= 255 ? $avatar : null;
     }
 
-    public function redirect(Request $request): RedirectResponse
+    private function googleProvider(): GoogleProvider
     {
         /** @var GoogleProvider $provider */
         $provider = Socialite::driver('google');
+        $redirectUrl = config('services.google.redirect') ?: route('auth.google.callback');
+
+        return $provider->redirectUrl($redirectUrl);
+    }
+
+    public function redirect(Request $request): RedirectResponse
+    {
+        $provider = $this->googleProvider();
         $pendingState = $this->pendingAnalysisService->oauthState(
             $this->pendingAnalysisService->token($request)
         );
@@ -52,8 +60,7 @@ class GoogleAuthController extends Controller
     public function callback(Request $request): RedirectResponse
     {
         try {
-            /** @var GoogleProvider $provider */
-            $provider = Socialite::driver('google');
+            $provider = $this->googleProvider();
             $googleUser = $provider->stateless()->user();
         } catch (\Throwable $exception) {
             return redirect()
