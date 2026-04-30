@@ -30,6 +30,9 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Copy application files
 COPY --chown=www-data:www-data . .
 
+# Create necessary directories before composer install
+RUN mkdir -p bootstrap/cache storage/logs storage/framework/cache storage/framework/sessions storage/framework/views
+
 # Copy built assets from node
 COPY --from=assets /app/public/build ./public/build
 
