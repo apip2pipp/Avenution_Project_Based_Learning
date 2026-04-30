@@ -48,4 +48,5 @@ RUN chmod -R 775 storage bootstrap/cache
 EXPOSE 8080
 
 # Start Laravel using PHP's built-in server to avoid Apache MPM issues
-CMD ["sh", "-c", "php artisan migrate --force || true; php artisan db:seed --class=FoodSeeder --force || true; php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"]
+# Seed core data (roles, admin user, foods) so production login works on fresh databases.
+CMD ["sh", "-c", "php artisan migrate --force || true; php artisan db:seed --class=DatabaseSeeder --force || true; php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"]
