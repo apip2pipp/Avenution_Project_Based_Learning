@@ -21,8 +21,9 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install -j$(nproc) gd zip mysqli pdo pdo_mysql \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Enable mod_rewrite
-RUN a2enmod rewrite
+# Enable mod_rewrite dan disable conflict modules
+RUN a2dismod mpm_prefork mpm_worker mpm_event 2>/dev/null || true
+RUN a2enmod rewrite mpm_prefork
 
 # Copy composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -51,5 +52,9 @@ RUN mkdir -p storage/logs && chown -R www-data:www-data storage
 
 EXPOSE 80
 
+# Setup and start
+RUN a2disconf app 2>/dev/null || true
+RUN a2enconf app
+
 # Run artisan commands and start apache
-CMD ["sh", "-c", "php artisan migrate --force && php artisan cache:clear && apache2-foreground"]
+CMD ["sh", "-c", "php artisan migrate --force 2>/dev/null; php artisan cache:clear 2>/dev/null; apache2-foreground"]
