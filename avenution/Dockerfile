@@ -26,14 +26,18 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Copy composer files first to leverage Docker cache when dependencies don't change
 COPY composer.json composer.lock* ./
 
-# Install PHP dependencies earlier (cacheable layer)
-RUN composer install --no-dev --optimize-autoloader --no-interaction --no-ansi --no-interaction --prefer-dist && rm -rf /root/.composer/cache
+# Install PHP dependencies earlier (cacheable layer) but skip scripts that need app files
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts --prefer-dist && rm -rf /root/.composer/cache
 
 # Create required Laravel directories before copying rest of application
 RUN mkdir -p bootstrap/cache storage/logs storage/framework/cache storage/framework/sessions storage/framework/views
 
 # Copy application files
 COPY . .
+
+# Run post-autoload scripts now the application files (including artisan) are present
+# This triggers Laravel's post-autoload actions (package discovery) which require the artisan file
+RUN composer dump-autoload -o && php artisan package:discover --ansi || true
 
 # Copy built assets from node
 COPY --from=assets /app/public/build ./public/build
