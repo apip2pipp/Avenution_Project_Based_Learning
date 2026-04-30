@@ -24,3 +24,4 @@ demo-data-*.php
 check-*.php
 public/hot
 .env
+vendor

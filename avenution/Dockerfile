@@ -23,15 +23,17 @@ RUN apt-get update && apt-get install -y \
 
 # Copy composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Copy composer files first to leverage Docker cache when dependencies don't change
+COPY composer.json composer.lock* ./
+
+# Install PHP dependencies earlier (cacheable layer)
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-ansi --no-interaction --prefer-dist && rm -rf /root/.composer/cache
+
+# Create required Laravel directories before copying rest of application
+RUN mkdir -p bootstrap/cache storage/logs storage/framework/cache storage/framework/sessions storage/framework/views
 
 # Copy application files
 COPY . .
-
-# Create required Laravel directories before Composer scripts run
-RUN mkdir -p bootstrap/cache storage/logs storage/framework/cache storage/framework/sessions storage/framework/views
-
-# Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 # Copy built assets from node
 COPY --from=assets /app/public/build ./public/build
@@ -42,4 +44,4 @@ RUN chmod -R 775 storage bootstrap/cache
 EXPOSE 8080
 
 # Start Laravel using PHP's built-in server to avoid Apache MPM issues
-CMD ["sh", "-c", "php artisan migrate --force 2>/dev/null || true; php artisan db:seed 2>/dev/null || true; php artisan cache:clear 2>/dev/null || true; php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"]
+CMD ["sh", "-c", "php artisan migrate --force || true; php artisan db:seed || true; php artisan cache:clear || true; php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"]
