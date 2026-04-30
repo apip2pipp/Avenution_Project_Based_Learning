@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Food;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\DB;
 
 class FoodSeeder extends Seeder
 {
@@ -14,10 +13,10 @@ class FoodSeeder extends Seeder
      */
     public function run(): void
     {
-        // Clear existing data (disable foreign key checks first)
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        Food::truncate();
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        if (Food::query()->exists()) {
+            $this->command->info('📦 Foods already exist, skipping seed.');
+            return;
+        }
 
         $this->command->info("📦 Importing makanan Indonesia dari 2 dataset...");
         $this->command->newLine();
