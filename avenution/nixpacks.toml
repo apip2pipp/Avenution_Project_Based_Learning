@@ -1,0 +1,18 @@
+[build]
+# PHP version
+php = "8.2"
+
+# Required PHP extensions for maatwebsite/excel
+php_extensions = ["zip", "gd", "xml", "sqlite"]
+
+# Node for assets
+nodejs = "18"
+
+# Commands to run during build
+install = ["npm install", "composer install --no-ansi --no-interaction --no-dev --no-scripts", "composer run-script post-autoload-dump", "npm run build"]
+
+# Commands to run before deploying
+build = ["php artisan migrate --force", "php artisan cache:clear"]
+
+[[start]]
+cmd = "vendor/bin/heroku-php-apache2 -C apache_app.conf public/"
