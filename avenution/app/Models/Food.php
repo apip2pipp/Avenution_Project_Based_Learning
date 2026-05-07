@@ -23,8 +23,6 @@ class Food extends Model
         'sodium',
         'cholesterol',
         'meal_type',
-        'description',
-        'image_url',
         'dietary_tags',
         'health_benefits',
         'emoji',
@@ -34,6 +32,16 @@ class Food extends Model
         'dietary_tags' => 'array',
         'health_benefits' => 'array',
     ];
+
+    /**
+     * Get emoji for the food's category
+     * 
+     * @return string
+     */
+    public function getEmojiAttribute(): string
+    {
+        return config('food-categories.categories.' . $this->category, '🍽️');
+    }
 
     /**
      * Get the recommendations for the food.

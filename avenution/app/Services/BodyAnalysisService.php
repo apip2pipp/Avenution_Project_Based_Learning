@@ -365,4 +365,32 @@ class BodyAnalysisService
 
         return (int) round($tdee);
     }
+
+    /**
+     * Calculate ideal weight based on height
+     * Using BMI 22 (middle of normal range 18.5-24.9)
+     * 
+     * @param float $height Height in cm
+     * @return array ['min' => min_weight, 'ideal' => ideal_weight, 'max' => max_weight] all in kg
+     */
+    public function calculateIdealWeight(float $height): array
+    {
+        $heightInMeters = $height / 100;
+        
+        // Normal BMI range is 18.5 - 24.9
+        // Min weight = 18.5 × height²
+        $minWeight = round(18.5 * ($heightInMeters * $heightInMeters), 1);
+        
+        // Ideal weight = 22 × height² (middle of normal range)
+        $idealWeight = round(22 * ($heightInMeters * $heightInMeters), 1);
+        
+        // Max weight = 24.9 × height²
+        $maxWeight = round(24.9 * ($heightInMeters * $heightInMeters), 1);
+        
+        return [
+            'min' => $minWeight,
+            'ideal' => $idealWeight,
+            'max' => $maxWeight,
+        ];
+    }
 }

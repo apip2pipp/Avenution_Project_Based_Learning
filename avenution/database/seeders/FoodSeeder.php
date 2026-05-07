@@ -90,10 +90,7 @@ class FoodSeeder extends Seeder
                 'sodium' => null,
                 'cholesterol' => null,
                 'meal_type' => $mealType,
-                'image_url' => $imageUrl,
                 'emoji' => $emoji,
-                'dietary_tags' => json_encode([]),
-                'health_benefits' => json_encode([]),
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
@@ -205,10 +202,7 @@ class FoodSeeder extends Seeder
                 'sodium' => $sodium > 0 ? $sodium : null,
                 'cholesterol' => null, // nilai-gizi.csv tidak punya cholesterol
                 'meal_type' => $mealType,
-                'image_url' => null,
                 'emoji' => $emoji,
-                'dietary_tags' => json_encode([]),
-                'health_benefits' => json_encode([]),
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
