@@ -51,6 +51,28 @@
                 </div>
             </div>
 
+            <!-- Normal BMI Range & Ideal Weight -->
+            <div class="bg-white dark:bg-gray-800/60 rounded-2xl shadow-lg p-8 mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Normal BMI Range & Recommended Weight</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-900/10 rounded-xl p-6 border border-green-200 dark:border-green-800">
+                        <div class="text-sm text-green-600 dark:text-green-400 font-semibold mb-2">Normal BMI Range</div>
+                        <div class="text-4xl font-bold text-green-700 dark:text-green-300 mb-2">18.5 - 24.9</div>
+                        <p class="text-sm text-green-600 dark:text-green-400">A healthy BMI range for adults</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-900/10 rounded-xl p-6 border border-blue-200 dark:border-blue-800">
+                        <div class="text-sm text-blue-600 dark:text-blue-400 font-semibold mb-2">Recommended Weight</div>
+                        <div class="text-4xl font-bold text-blue-700 dark:text-blue-300 mb-2">{{ $idealWeight['ideal'] }} kg</div>
+                        <p class="text-sm text-blue-600 dark:text-blue-400">Ideal weight for your height</p>
+                    </div>
+                </div>
+                <div class="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                    <p class="text-sm text-gray-700 dark:text-gray-300">
+                        <span class="font-semibold">Weight Range ({{ $analysis->height }} cm):</span> {{ $idealWeight['min'] }} kg - {{ $idealWeight['max'] }} kg
+                    </p>
+                </div>
+            </div>
+
             <!-- Health Warnings -->
             @if(count($warnings) > 0)
                 <div class="bg-white dark:bg-gray-800/60 rounded-2xl shadow-lg p-8 mb-8">
@@ -124,9 +146,23 @@
                                 </div>
 
                                 <!-- Benefits -->
-                                @if($food->health_benefits && count($food->health_benefits) > 0)
+                                @php
+                                    $rawBenefits = $food->health_benefits ?? [];
+
+                                    if (is_string($rawBenefits)) {
+                                        $benefits = array_filter(array_map('trim', explode(',', $rawBenefits)));
+                                    } elseif (is_array($rawBenefits)) {
+                                        $benefits = $rawBenefits;
+                                    } elseif ($rawBenefits instanceof \Illuminate\Contracts\Support\Arrayable) {
+                                        $benefits = $rawBenefits->toArray();
+                                    } else {
+                                        $benefits = [];
+                                    }
+                                @endphp
+
+                                @if(count($benefits) > 0)
                                     <div class="flex flex-wrap gap-1">
-                                        @foreach(array_slice($food->health_benefits, 0, 3) as $benefit)
+                                        @foreach(array_slice($benefits, 0, 3) as $benefit)
                                             <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs">
                                                 <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                                                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>

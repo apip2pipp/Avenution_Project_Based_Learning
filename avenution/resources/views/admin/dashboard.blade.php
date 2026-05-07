@@ -104,7 +104,7 @@
                 <div class="flex items-start justify-between gap-4">
                     <div>
                         <p class="text-sm font-medium uppercase tracking-[0.25em] text-slate-500 dark:text-slate-400">Manage User</p>
-                        <h3 class="mt-3 text-2xl font-bold text-slate-950 dark:text-white">User account CRUD</h3>
+                        <h3 class="mt-3 text-2xl font-bold text-slate-950 dark:text-white">User account</h3>
                         <p class="mt-3 max-w-xl text-sm leading-6 text-slate-600 dark:text-slate-400">Create, update, and assign roles for user accounts from one place.</p>
                     </div>
                     <span class="rounded-2xl bg-slate-950 px-4 py-3 text-white transition-colors group-hover:bg-sky-600">
@@ -115,7 +115,7 @@
         </section>
 
         <section class="rounded-[1.75rem] border border-slate-200/80 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
-            <div class="flex items-center justify-between border-b border-slate-200/80 px-6 py-5 dark:border-slate-800">
+            <div class="flex flex-col gap-4 border-b border-slate-200/80 px-6 py-5 dark:border-slate-800 lg:flex-row lg:items-center lg:justify-between">
                 <div>
                     <h3 class="text-xl font-bold text-slate-950 dark:text-white">Recent Analyses</h3>
                     <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Latest activity from the analysis flow.</p>
@@ -123,13 +123,43 @@
             </div>
 
             @if($recentAnalyses->count() > 0)
+                <div class="border-b border-slate-200/80 px-6 py-4 dark:border-slate-800">
+                    <form action="{{ route('admin.dashboard') }}" method="GET" class="grid gap-4 lg:grid-cols-[1fr_120px_auto]">
+                        <div>
+                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search name/email..." class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:bg-white dark:border-slate-700 dark:bg-slate-800 dark:text-white">
+                        </div>
+                        <div class="relative">
+                            <select name="per_page" class="w-full appearance-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 pr-8 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:bg-white dark:border-slate-700 dark:bg-slate-800 dark:text-white" onchange="this.form.submit()">
+                                <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>Show 10 rows</option>
+                                <option value="20" {{ request('per_page', 10) == 20 ? 'selected' : '' }}>Show 20 rows</option>
+                                <option value="50" {{ request('per_page', 10) == 50 ? 'selected' : '' }}>Show 50 rows</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-slate-800">Search</button>
+                    </form>
+                </div>
+
                 <div class="overflow-x-auto">
                     <table class="w-full">
                         <thead class="bg-slate-50 dark:bg-slate-800/70">
                             <tr>
-                                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Date</th>
+                                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <a href="{{ route('admin.dashboard', [...request()->query(), 'sort_by' => 'created_at', 'sort_order' => request('sort_order') === 'asc' ? 'desc' : 'asc']) }}" class="hover:text-slate-700 dark:hover:text-slate-300">
+                                        Date
+                                        @if(request('sort_by') === 'created_at')
+                                            <span>{{ request('sort_order') === 'asc' ? '▲' : '▼' }}</span>
+                                        @endif
+                                    </a>
+                                </th>
                                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">User</th>
-                                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">BMI</th>
+                                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <a href="{{ route('admin.dashboard', [...request()->query(), 'sort_by' => 'bmi', 'sort_order' => request('sort_order') === 'asc' ? 'desc' : 'asc']) }}" class="hover:text-slate-700 dark:hover:text-slate-300">
+                                        BMI
+                                        @if(request('sort_by') === 'bmi')
+                                            <span>{{ request('sort_order') === 'asc' ? '▲' : '▼' }}</span>
+                                        @endif
+                                    </a>
+                                </th>
                                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Category</th>
                                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Recommendations</th>
                             </tr>
@@ -162,6 +192,10 @@
                             @endforeach
                         </tbody>
                     </table>
+                </div>
+
+                <div class="border-t border-slate-200/80 px-6 py-5 dark:border-slate-800">
+                    {{ $recentAnalyses->links() }}
                 </div>
             @else
                 <div class="px-6 py-12 text-center text-slate-500 dark:text-slate-400">No analyses yet</div>

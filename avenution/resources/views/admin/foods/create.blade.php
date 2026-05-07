@@ -17,13 +17,22 @@
     <div class="py-12">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800/60 rounded-2xl shadow-lg p-8">
-                <form action="{{ route('admin.foods.store') }}" method="POST">
+                <form action="{{ route('admin.foods.store') }}" method="POST" x-data="foodForm()">
                     @csrf
+                    @php
+                        $dietaryTagOptions = config('food-label-options.dietary_tags', []);
+                        $healthBenefitOptions = config('food-label-options.health_benefits', []);
+                        $selectedDietaryTags = old('dietary_tags', []);
+                        $selectedHealthBenefits = old('health_benefits', []);
+
+                        $selectedDietaryTags = is_array($selectedDietaryTags) ? $selectedDietaryTags : [];
+                        $selectedHealthBenefits = is_array($selectedHealthBenefits) ? $selectedHealthBenefits : [];
+                    @endphp
 
                     <!-- Basic Information -->
                     <div class="mb-8">
                         <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Basic Information</h3>
-                        
+
                         <div class="grid md:grid-cols-2 gap-6">
                             <div>
                                 <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -40,7 +49,7 @@
                                 <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                     Category <span class="text-red-500">*</span>
                                 </label>
-                                <select name="category" id="category" required
+                                <select name="category" id="category" required @change="updateEmoji($event)"
                                     class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
                                     <option value="">Select category</option>
                                     <option value="Protein Hewani" {{ old('category') === 'Protein Hewani' ? 'selected' : '' }}>Protein Hewani</option>
@@ -58,45 +67,18 @@
 
                             <div>
                                 <label for="emoji" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Emoji <span class="text-red-500">*</span>
+                                    Emoji <span class="text-red-500">*</span> <span class="text-xs text-gray-500">(Auto-generated)</span>
                                 </label>
-                                <input type="text" name="emoji" id="emoji" value="{{ old('emoji') }}" required maxlength="4"
-                                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                                    placeholder="🥗">
-                                @error('emoji')
-                                    <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
-                                @enderror
+                                <div class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-100 dark:bg-gray-600 text-gray-900 dark:text-white text-center text-3xl font-bold" x-text="emoji">🍽️</div>
+                                <input type="hidden" name="emoji" id="emoji" :value="emoji">
                             </div>
-
-                            <div>
-                                <label for="image_url" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Image URL
-                                </label>
-                                <input type="url" name="image_url" id="image_url" value="{{ old('image_url') }}"
-                                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                                    placeholder="https://example.com/image.jpg">
-                                @error('image_url')
-                                    <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="mt-6">
-                            <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                Description <span class="text-red-500">*</span>
-                            </label>
-                            <textarea name="description" id="description" rows="3" required
-                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">{{ old('description') }}</textarea>
-                            @error('description')
-                                <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
-                            @enderror
                         </div>
                     </div>
 
                     <!-- Nutritional Information -->
                     <div class="mb-8">
                         <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Nutritional Information</h3>
-                        
+
                         <div class="grid md:grid-cols-3 gap-6">
                             <div>
                                 <label for="calories" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -180,7 +162,7 @@
                                     Cholesterol (mg)
                                 </label>
                                 <input type="number" name="cholesterol" id="cholesterol" value="{{ old('cholesterol') }}" min="0" step="0.1"
-                                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus;border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
                                 @error('cholesterol')
                                     <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
                                 @enderror
@@ -191,16 +173,20 @@
                     <!-- Tags & Benefits -->
                     <div class="mb-8">
                         <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Tags & Benefits</h3>
-                        
+
                         <div class="grid md:grid-cols-2 gap-6">
                             <div>
                                 <label for="dietary_tags" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Dietary Tags
+                                    Dietary Tags <span class="text-xs text-gray-500">(choose all that apply)</span>
                                 </label>
-                                <input type="text" name="dietary_tags" id="dietary_tags" value="{{ old('dietary_tags') }}"
-                                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                                    placeholder="vegetarian, gluten-free, low-sodium">
-                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Separate multiple tags with commas</p>
+                                <div class="grid gap-3 sm:grid-cols-2">
+                                    @foreach ($dietaryTagOptions as $tag)
+                                        <label class="flex items-center gap-3 rounded-xl border border-gray-200 dark:border-gray-700 px-4 py-3 bg-gray-50 dark:bg-gray-700/50 hover:border-primary cursor-pointer transition-colors">
+                                            <input type="checkbox" name="dietary_tags[]" value="{{ $tag }}" {{ in_array($tag, $selectedDietaryTags, true) ? 'checked' : '' }} class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary">
+                                            <span class="text-sm font-medium text-gray-800 dark:text-gray-200">{{ $tag }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
                                 @error('dietary_tags')
                                     <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
                                 @enderror
@@ -208,12 +194,16 @@
 
                             <div>
                                 <label for="health_benefits" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Health Benefits
+                                    Health Benefits <span class="text-xs text-gray-500">(choose all that apply)</span>
                                 </label>
-                                <input type="text" name="health_benefits" id="health_benefits" value="{{ old('health_benefits') }}"
-                                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                                    placeholder="Heart-healthy, High fiber, Rich in vitamins">
-                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Separate multiple benefits with commas</p>
+                                <div class="grid gap-3 sm:grid-cols-2">
+                                    @foreach ($healthBenefitOptions as $benefit)
+                                        <label class="flex items-center gap-3 rounded-xl border border-gray-200 dark:border-gray-700 px-4 py-3 bg-gray-50 dark:bg-gray-700/50 hover:border-primary cursor-pointer transition-colors">
+                                            <input type="checkbox" name="health_benefits[]" value="{{ $benefit }}" {{ in_array($benefit, $selectedHealthBenefits, true) ? 'checked' : '' }} class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary">
+                                            <span class="text-sm font-medium text-gray-800 dark:text-gray-200">{{ $benefit }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
                                 @error('health_benefits')
                                     <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
                                 @enderror
@@ -234,4 +224,25 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function foodForm() {
+            const categoryEmojis = {
+                'Protein Hewani': '🍗',
+                'Protein Nabati': '🫘',
+                'Karbohidrat': '🍞',
+                'Sayuran': '🥬',
+                'Buah': '🍎',
+                'Dairy': '🥛',
+                'Lainnya': '🍽️',
+            };
+
+            return {
+                emoji: categoryEmojis['Lainnya'],
+                updateEmoji(e) {
+                    this.emoji = categoryEmojis[e.target.value] || '🍽️';
+                }
+            };
+        }
+    </script>
 </x-admin-layout>
