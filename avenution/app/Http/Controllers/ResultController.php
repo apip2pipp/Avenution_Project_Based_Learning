@@ -46,7 +46,8 @@ class ResultController extends Controller
 
         $healthSummary = $this->bodyAnalysisService->getHealthSummary($analysis);
         $warnings = $this->bodyAnalysisService->generateHealthWarnings($analysis);
+        $idealWeight = $this->bodyAnalysisService->calculateIdealWeight($analysis->height);
 
-        return view('result', compact('analysis', 'healthSummary', 'warnings'));
+        return view('result', compact('analysis', 'healthSummary', 'warnings', 'idealWeight'));
     }
 }

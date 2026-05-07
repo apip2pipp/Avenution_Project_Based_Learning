@@ -10,7 +10,7 @@ use App\Models\Analysis;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $stats = [
             'totalUsers' => User::count(),
@@ -18,10 +18,31 @@ class DashboardController extends Controller
             'totalFoods' => Food::count(),
         ];
 
-        $recentAnalyses = Analysis::with(['user', 'recommendations'])
-            ->latest()
-            ->take(10)
-            ->get();
+        $analysisQuery = Analysis::with(['user', 'recommendations']);
+        
+        // Search by user name or email
+        if ($request->filled('search')) {
+            $search = trim((string) $request->input('search'));
+            $analysisQuery->whereHas('user', function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('email', 'like', '%' . $search . '%');
+            });
+        }
+
+        // Sorting
+        $sortBy = $request->input('sort_by', 'created_at');
+        $sortOrder = $request->input('sort_order', 'desc');
+        
+        $allowedSortColumns = ['created_at', 'bmi', 'bmi_category'];
+        if (!in_array($sortBy, $allowedSortColumns)) {
+            $sortBy = 'created_at';
+        }
+        
+        $analysisQuery->orderBy($sortBy, $sortOrder);
+
+        // Pagination
+        $perPage = $request->input('per_page', 10);
+        $recentAnalyses = $analysisQuery->paginate($perPage)->appends($request->query());
 
         return view('admin.dashboard', compact('stats', 'recentAnalyses'));
     }

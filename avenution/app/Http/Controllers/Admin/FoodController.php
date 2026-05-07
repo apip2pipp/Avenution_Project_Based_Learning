@@ -33,7 +33,21 @@ class FoodController extends Controller
             $query->where('category', $request->category);
         }
 
-        $foods = $query->latest()->paginate(20);
+        // Sorting
+        $sortBy = $request->input('sort_by', 'name');
+        $sortOrder = $request->input('sort_order', 'asc');
+        
+        // Validate sort column to prevent SQL injection
+        $allowedSortColumns = ['name', 'category', 'calories', 'created_at'];
+        if (!in_array($sortBy, $allowedSortColumns)) {
+            $sortBy = 'name';
+        }
+        
+        $query->orderBy($sortBy, $sortOrder);
+
+        // Pagination
+        $perPage = $request->input('per_page', 20);
+        $foods = $query->paginate($perPage)->appends($request->query());
         
         // Get all categories for filter dropdown
         $categories = Food::select('category')->distinct()->pluck('category');
@@ -186,7 +200,11 @@ class FoodController extends Controller
      */
     public function store(StoreFoodRequest $request)
     {
-        Food::create($request->validated());
+        $data = $request->validated();
+        $data['dietary_tags'] = $this->normalizeLabelSelections($request->input('dietary_tags'));
+        $data['health_benefits'] = $this->normalizeLabelSelections($request->input('health_benefits'));
+
+        Food::create($data);
 
         return redirect()->route('admin.foods.index')
             ->with('success', 'Food item created successfully!');
@@ -213,7 +231,11 @@ class FoodController extends Controller
      */
     public function update(UpdateFoodRequest $request, Food $food)
     {
-        $food->update($request->validated());
+        $data = $request->validated();
+        $data['dietary_tags'] = $this->normalizeLabelSelections($request->input('dietary_tags'));
+        $data['health_benefits'] = $this->normalizeLabelSelections($request->input('health_benefits'));
+
+        $food->update($data);
 
         return redirect()->route('admin.foods.index')
             ->with('success', 'Food item updated successfully!');
@@ -249,5 +271,21 @@ class FoodController extends Controller
         }
 
         return $clean;
+    }
+
+    private function normalizeLabelSelections(mixed $value): array
+    {
+        if (is_array($value)) {
+            $items = $value;
+        } elseif (is_string($value) && trim($value) !== '') {
+            $items = preg_split('/[,|;]/', $value) ?: [];
+        } else {
+            $items = [];
+        }
+
+        $items = array_map(static fn ($item) => trim((string) $item), $items);
+        $items = array_values(array_filter($items, static fn ($item) => $item !== ''));
+
+        return array_values(array_unique($items));
     }
 }

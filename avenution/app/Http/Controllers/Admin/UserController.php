@@ -15,7 +15,7 @@ class UserController extends Controller
     {
         $baseQuery = User::query();
 
-        $users = (clone $baseQuery)
+        $query = (clone $baseQuery)
             ->withCount('analyses')
             ->with('roles')
             ->when($request->filled('search'), function ($query) use ($request) {
@@ -27,11 +27,27 @@ class UserController extends Controller
                         ->orWhere('email', 'like', '%' . $search . '%')
                         ->orWhere('phone', 'like', '%' . $search . '%');
                 });
-            })
-            ->latest()
-            ->paginate(12);
+            });
 
-        $users->appends($request->except('page'));
+        // Sorting
+        $sortBy = $request->input('sort_by', 'created_at');
+        $sortOrder = $request->input('sort_order', 'desc');
+        
+        // Validate sort column to prevent SQL injection
+        $allowedSortColumns = ['name', 'email', 'created_at', 'role', 'analyses_count'];
+        if (!in_array($sortBy, $allowedSortColumns)) {
+            $sortBy = 'created_at';
+        }
+        
+        if ($sortBy === 'analyses_count') {
+            $query->orderByRaw('(SELECT COUNT(*) FROM analyses WHERE user_id = users.id) ' . $sortOrder);
+        } else {
+            $query->orderBy($sortBy, $sortOrder);
+        }
+
+        // Pagination
+        $perPage = $request->input('per_page', 20);
+        $users = $query->paginate($perPage)->appends($request->query());
 
         $stats = [
             'totalUsers' => (clone $baseQuery)->count(),
