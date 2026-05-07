@@ -28,9 +28,16 @@
         </section>
 
         <section class="rounded-[1.75rem] border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-            <form action="{{ route('admin.users.index') }}" method="GET" class="flex flex-col gap-4 lg:flex-row">
-                <div class="flex-1">
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by name, username, email, or phone..." class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:bg-white dark:border-slate-700 dark:bg-slate-800 dark:text-white">
+            <form action="{{ route('admin.users.index') }}" method="GET" class="grid gap-4 lg:grid-cols-[1fr_120px_auto_auto]">
+                <div>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search name/email..." class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:bg-white dark:border-slate-700 dark:bg-slate-800 dark:text-white">
+                </div>
+                <div class="relative">
+                    <select name="per_page" class="w-full appearance-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 pr-8 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:bg-white dark:border-slate-700 dark:bg-slate-800 dark:text-white" onchange="this.form.submit()">
+                        <option value="10" {{ request('per_page', 20) == 10 ? 'selected' : '' }}>Show 10 rows</option>
+                        <option value="20" {{ request('per_page', 20) == 20 ? 'selected' : '' }}>Show 20 rows</option>
+                        <option value="50" {{ request('per_page', 20) == 50 ? 'selected' : '' }}>Show 50 rows</option>
+                    </select>
                 </div>
                 <button type="submit" class="rounded-2xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-slate-800">Search</button>
                 @if(request('search'))
@@ -45,11 +52,32 @@
                     <table class="w-full">
                         <thead class="bg-slate-50 dark:bg-slate-800/70">
                             <tr>
-                                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">User</th>
+                                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <a href="{{ route('admin.users.index', [...request()->query(), 'sort_by' => 'name', 'sort_order' => request('sort_order') === 'asc' ? 'desc' : 'asc']) }}" class="hover:text-slate-700 dark:hover:text-slate-300">
+                                        User
+                                        @if(request('sort_by') === 'name')
+                                            <span>{{ request('sort_order') === 'asc' ? '▲' : '▼' }}</span>
+                                        @endif
+                                    </a>
+                                </th>
                                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Profile</th>
-                                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Role</th>
+                                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <a href="{{ route('admin.users.index', [...request()->query(), 'sort_by' => 'role', 'sort_order' => request('sort_order') === 'asc' ? 'desc' : 'asc']) }}" class="hover:text-slate-700 dark:hover:text-slate-300">
+                                        Role
+                                        @if(request('sort_by') === 'role')
+                                            <span>{{ request('sort_order') === 'asc' ? '▲' : '▼' }}</span>
+                                        @endif
+                                    </a>
+                                </th>
                                 <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Status</th>
-                                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Analysis</th>
+                                <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    <a href="{{ route('admin.users.index', [...request()->query(), 'sort_by' => 'analyses_count', 'sort_order' => request('sort_order') === 'asc' ? 'desc' : 'asc']) }}" class="hover:text-slate-700 dark:hover:text-slate-300">
+                                        Analysis
+                                        @if(request('sort_by') === 'analyses_count')
+                                            <span>{{ request('sort_order') === 'asc' ? '▲' : '▼' }}</span>
+                                        @endif
+                                    </a>
+                                </th>
                                 <th class="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Actions</th>
                             </tr>
                         </thead>

@@ -9,7 +9,7 @@
         </div>
     </x-slot>
 
-    <section class="rounded-[1.75rem] border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <section class="rounded-[1.75rem] border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8 lg:p-10 dark:border-slate-800 dark:bg-slate-900">
         @include('admin.users._form', [
             'user' => null,
             'action' => route('admin.users.store'),

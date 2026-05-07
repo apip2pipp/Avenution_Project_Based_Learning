@@ -1,7 +1,7 @@
 <section class="space-y-6">
     <header>
         <h2 class="text-xl font-bold text-red-700 dark:text-red-400">
-            {{ __('Delete / Reset Test Account') }}
+            {{ __('Delete Account') }}
         </h2>
 
         <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">
