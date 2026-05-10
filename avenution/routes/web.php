@@ -25,6 +25,11 @@ Route::get('/result/{sessionId}', [ResultController::class, 'show'])
     ->middleware('auth')
     ->name('result.show');
 
+// Sitemap for SEO
+Route::get('/sitemap.xml', function () {
+    return response()->view('sitemap', [], 200, ['Content-Type' => 'application/xml']);
+});
+
 /*
 |--------------------------------------------------------------------------
 | Authenticated User Routes
