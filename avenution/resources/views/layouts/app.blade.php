@@ -4,6 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
+        <meta name="google-site-verification" content="X1W8WQTviPp43pQD-gz8DJ_p_-kF_3-qMmv1mMoZBEY" />
         <link rel="icon" type="image/png" href="{{ asset('images/icon_Avenution.png') }}">
 
         <title>{{ config('app.name', 'Avenution') }} - {{ $title ?? 'Smart Food Recommendations' }}</title>
