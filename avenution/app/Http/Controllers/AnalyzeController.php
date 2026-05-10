@@ -17,7 +17,11 @@ class AnalyzeController extends Controller
 
     public function index()
     {
-        return view('analyze');
+        $title = 'Analyze — Avenution';
+        $metaDescription = 'Input your health data to get personalized food recommendations powered by AI.';
+        $ogImage = asset('images/food.png');
+
+        return view('analyze', compact('title', 'metaDescription', 'ogImage'));
     }
 
     public function analyze(AnalyzeRequest $request)

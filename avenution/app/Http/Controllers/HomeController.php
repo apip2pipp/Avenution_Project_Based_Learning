@@ -17,6 +17,10 @@ class HomeController extends Controller
             'rating' => '4.9★',
         ];
 
-        return view('landing', compact('stats'));
+        $title = 'Avenution — Smart Food Recommendations';
+        $metaDescription = 'Avenution uses advanced AI to analyze your health metrics and deliver personalized nutrition plans tailored to your body.';
+        $ogImage = asset('images/hero.png');
+
+        return view('landing', compact('stats', 'title', 'metaDescription', 'ogImage'));
     }
 }

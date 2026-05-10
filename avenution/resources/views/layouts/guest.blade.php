@@ -8,6 +8,20 @@
 
         <title>{{ config('app.name', 'Avenution') }} - {{ $title ?? 'Smart Food Recommendations' }}</title>
 
+        <!-- SEO defaults (overridable per-view) -->
+        <meta name="description" content="{{ $metaDescription ?? 'Avenution — Smart Food Recommendations for healthier choices' }}">
+
+        <meta property="og:title" content="{{ $title ?? config('app.name', 'Avenution') }}">
+        <meta property="og:description" content="{{ $metaDescription ?? 'Avenution — Smart Food Recommendations for healthier choices' }}">
+        <meta property="og:url" content="{{ url()->current() }}">
+        <meta property="og:type" content="website">
+        <meta property="og:image" content="{{ $ogImage ?? asset('images/icon_Avenution.png') }}">
+
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="{{ $title ?? config('app.name', 'Avenution') }}">
+        <meta name="twitter:description" content="{{ $metaDescription ?? 'Avenution — Smart Food Recommendations for healthier choices' }}">
+        <meta name="twitter:image" content="{{ $ogImage ?? asset('images/icon_Avenution.png') }}">
+
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
