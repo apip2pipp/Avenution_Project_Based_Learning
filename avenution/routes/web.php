@@ -27,7 +27,21 @@ Route::get('/result/{sessionId}', [ResultController::class, 'show'])
 
 // Sitemap for SEO
 Route::get('/sitemap.xml', function () {
-    return response()->view('sitemap', [], 200, ['Content-Type' => 'application/xml']);
+    $sitemap = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+    $sitemap .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+    $sitemap .= '    <url>' . "\n";
+    $sitemap .= '        <loc>' . url('/') . '</loc>' . "\n";
+    $sitemap .= '        <changefreq>daily</changefreq>' . "\n";
+    $sitemap .= '        <priority>1.0</priority>' . "\n";
+    $sitemap .= '    </url>' . "\n";
+    $sitemap .= '    <url>' . "\n";
+    $sitemap .= '        <loc>' . url('/analyze') . '</loc>' . "\n";
+    $sitemap .= '        <changefreq>weekly</changefreq>' . "\n";
+    $sitemap .= '        <priority>0.8</priority>' . "\n";
+    $sitemap .= '    </url>' . "\n";
+    $sitemap .= '</urlset>';
+    
+    return response($sitemap, 200, ['Content-Type' => 'application/xml; charset=utf-8']);
 });
 
 /*
