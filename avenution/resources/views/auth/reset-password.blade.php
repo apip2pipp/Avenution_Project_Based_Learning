@@ -129,4 +129,49 @@
             </a>
         </p>
     </div>
+
+    @if (session('status'))
+        <div 
+            x-data="{ show: true }"
+            x-show="show"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 translate-y-2"
+            x-transition:enter-end="opacity-100 translate-y-0"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            x-init="setTimeout(() => show = false, 3500)"
+            class="fixed top-5 right-5 z-50"
+            style="display: none;"
+        >
+            <div class="flex items-start gap-3 rounded-2xl bg-green-500 px-5 py-4 shadow-2xl text-white min-w-[320px]">
+
+                <!-- ICON -->
+                <div class="mt-0.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" 
+                        class="w-6 h-6" 
+                        fill="none" 
+                        viewBox="0 0 24 24" 
+                        stroke="currentColor">
+                        <path stroke-linecap="round" 
+                            stroke-linejoin="round" 
+                            stroke-width="2" 
+                            d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+
+                <!-- TEXT -->
+                <div>
+                    <h3 class="font-semibold text-sm">
+                        Password Updated
+                    </h3>
+
+                    <p class="text-sm text-green-100 mt-0.5">
+                        Your password has been reset successfully.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    @endif
 </x-auth-layout>
