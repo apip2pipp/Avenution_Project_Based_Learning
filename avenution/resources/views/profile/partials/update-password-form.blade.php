@@ -26,14 +26,16 @@
         @endif
 
         <div>
-            <x-input-label for="new_password" :value="__('New Password')" />
-            <x-text-input id="new_password" name="new_password" type="password" class="mt-1 block w-full" />
+            <x-password-input id="new_password" name="new_password" placeholder="Enter new password">
+                {{ __('New Password') }}
+            </x-password-input>
             <x-input-error :messages="$errors->get('new_password')" class="mt-2" />
         </div>
 
         <div>
-            <x-input-label for="new_password_confirmation" :value="__('Confirm Password')" />
-            <x-text-input id="new_password_confirmation" name="new_password_confirmation" type="password" class="mt-1 block w-full" />
+            <x-password-input id="new_password_confirmation" name="new_password_confirmation" placeholder="Confirm new password">
+                {{ __('Confirm Password') }}
+            </x-password-input>
         </div>
 
         <div class="flex items-center gap-4">
