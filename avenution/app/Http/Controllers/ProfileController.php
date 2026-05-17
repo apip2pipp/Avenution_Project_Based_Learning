@@ -31,13 +31,20 @@ class ProfileController extends Controller
     {
         $validated = $request->validated();
         $user = $request->user();
+        $oldProfilePhotoPath = $user->profile_photo_path;
 
         if ($request->hasFile('profile_photo')) {
-            if ($user->profile_photo_path) {
-                Storage::disk('public')->delete($user->profile_photo_path);
+            $newProfilePhotoPath = $request->file('profile_photo')->store('profile-photos', 'public');
+
+            if (! $newProfilePhotoPath) {
+                return Redirect::route('profile.edit')
+                    ->withInput()
+                    ->withErrors([
+                        'profile_photo' => 'Profile photo upload failed. Please try again.',
+                    ]);
             }
 
-            $validated['profile_photo_path'] = $request->file('profile_photo')->store('profile-photos', 'public');
+            $validated['profile_photo_path'] = $newProfilePhotoPath;
         }
 
         unset($validated['profile_photo']);
@@ -49,6 +56,14 @@ class ProfileController extends Controller
         }
 
         $user->save();
+
+        if (
+            isset($validated['profile_photo_path'])
+            && $oldProfilePhotoPath
+            && $oldProfilePhotoPath !== $validated['profile_photo_path']
+        ) {
+            Storage::disk('public')->delete($oldProfilePhotoPath);
+        }
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }

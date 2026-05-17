@@ -77,6 +77,7 @@ class GoogleAuthController extends Controller
                 ->withErrors(['login' => 'Google did not return a valid account.']);
         }
 
+        $googleName = trim((string) $googleUser->getName());
         $existingUser = User::query()->where('email', $email)->first();
 
         if ($existingUser) {
@@ -99,12 +100,18 @@ class GoogleAuthController extends Controller
                     ->with('status', 'This email is already registered. Please sign in with your password to confirm Google linking.');
             }
 
-            $existingUser->forceFill([
+            $updates = [
                 'google_avatar' => $this->normalizeGoogleAvatar($googleUser->getAvatar()) ?: $existingUser->google_avatar,
-                'name' => $googleUser->getName() ?: $existingUser->name,
                 'auth_provider' => 'google',
                 'email_verified_at' => $existingUser->email_verified_at ?? now(),
-            ])->save();
+            ];
+
+            // Keep a profile name customized by the user. Sync from Google only when name is empty.
+            if (blank($existingUser->name) && $googleName !== '') {
+                $updates['name'] = $googleName;
+            }
+
+            $existingUser->forceFill($updates)->save();
 
             Auth::login($existingUser, true);
             $request->session()->regenerate();
@@ -123,7 +130,7 @@ class GoogleAuthController extends Controller
         }
 
         $user = User::create([
-            'name' => $googleUser->getName() ?: 'Google User',
+            'name' => $googleName !== '' ? $googleName : 'Google User',
             'email' => $email,
             'password' => null,
             'google_id' => $googleId,

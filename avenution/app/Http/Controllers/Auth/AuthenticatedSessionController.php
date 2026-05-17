@@ -49,13 +49,19 @@ class AuthenticatedSessionController extends Controller
             && isset($pendingGoogleLink['email'])
             && strcasecmp((string) $user->email, (string) $pendingGoogleLink['email']) === 0
         ) {
-            $user->forceFill([
+            $updates = [
                 'google_id' => $pendingGoogleLink['google_id'] ?? $user->google_id,
                 'google_avatar' => $pendingGoogleLink['google_avatar'] ?? $user->google_avatar,
-                'name' => $pendingGoogleLink['google_name'] ?? $user->name,
                 'auth_provider' => 'google',
                 'email_verified_at' => $user->email_verified_at ?? now(),
-            ])->save();
+            ];
+
+            $googleName = trim((string) ($pendingGoogleLink['google_name'] ?? ''));
+            if (blank($user->name) && $googleName !== '') {
+                $updates['name'] = $googleName;
+            }
+
+            $user->forceFill($updates)->save();
 
             if (! $pendingAnalysisPayload) {
                 return redirect()

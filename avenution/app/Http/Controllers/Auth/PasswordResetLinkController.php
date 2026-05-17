@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
 use Illuminate\View\View;
 use Throwable;
@@ -54,6 +55,16 @@ class PasswordResetLinkController extends Controller
                         : back()->withInput($request->only('email'))
                                 ->withErrors(['email' => __($status)]);
         } catch (Throwable $exception) {
+            Log::warning('Password reset link delivery failed.', [
+                'email_hash' => hash('sha256', strtolower((string) $request->input('email'))),
+                'mail_mailer' => config('mail.default'),
+                'smtp_host' => config('mail.mailers.smtp.host'),
+                'smtp_port' => config('mail.mailers.smtp.port'),
+                'smtp_encryption' => config('mail.mailers.smtp.encryption'),
+                'mail_from_configured' => filled(config('mail.from.address')) && config('mail.from.address') !== 'hello@example.com',
+                'exception' => get_class($exception),
+            ]);
+
             report($exception);
 
             return back()->withInput($request->only('email'))
