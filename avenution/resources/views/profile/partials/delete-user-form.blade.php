@@ -16,7 +16,7 @@
     <x-danger-button
         x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')"
     >
-        {{ __('Reset Test Account') }}
+        {{ __('Reset Account') }}
     </x-danger-button>
 
     <!-- MODAL -->
@@ -104,7 +104,7 @@
                 </x-secondary-button>
 
                 <x-danger-button type="submit">
-                    {{ __('Reset Test Account') }}
+                    {{ __('Reset Account') }}
                 </x-danger-button>
 
             </div>
