@@ -5,15 +5,25 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Food;
 use App\Models\Analysis;
+use Illuminate\Support\Facades\Schema;
 
 class HomeController extends Controller
 {
     public function index()
     {
+        $foodsCount = 0;
+        if (Schema::hasTable('foods')) {
+            try {
+                $foodsCount = Food::count();
+            } catch (\Throwable $e) {
+                $foodsCount = 0;
+            }
+        }
+
         $stats = [
             'users' => '50,000+',
             'accuracy' => '98%',
-            'foods' => Food::count() . '+',
+            'foods' => $foodsCount . '+',
             'rating' => '4.9★',
         ];
 
