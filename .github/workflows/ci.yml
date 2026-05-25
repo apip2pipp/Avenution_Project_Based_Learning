@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v4
+        with:
+          php-version: '8.1'
+          extensions: pdo, pdo_sqlite, sqlite3, mbstring, openssl, tokenizer, xml, curl, json
+
+      - name: Composer install (avenution)
+        working-directory: avenution
+        run: composer install --prefer-dist --no-progress --no-suggest --no-interaction
+
+      - name: Prepare .env.testing
+        working-directory: avenution
+        run: |
+          if [ ! -f .env.testing ]; then
+            cp .env.example .env.testing || true
+          fi
+          php artisan key:generate --env=testing --no-interaction
+
+      - name: Run migrations (testing)
+        working-directory: avenution
+        run: php artisan migrate --env=testing --force
+
+      - name: Run PHPUnit
+        working-directory: avenution
+        run: php artisan test --env=testing --verbose

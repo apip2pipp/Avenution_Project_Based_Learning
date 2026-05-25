@@ -15,6 +15,7 @@
         "spatie/laravel-permission": "^6.24"
     },
     "require-dev": {
+        "doctrine/dbal": "^3.10",
         "fakerphp/faker": "^1.9.1",
         "laravel/breeze": "^1.29",
         "laravel/pint": "^1.0",
@@ -41,6 +42,7 @@
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
         ],
+        "test": "php artisan test --env=testing",
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
         ],

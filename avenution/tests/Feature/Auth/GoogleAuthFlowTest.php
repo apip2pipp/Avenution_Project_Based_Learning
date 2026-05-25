@@ -86,14 +86,17 @@ class GoogleAuthFlowTest extends TestCase
             'avatar' => null,
         ]);
 
-        $provider = \Mockery::mock();
+        // Bind a Socialite factory mock into the container that returns a provider mock
+        $provider = \Mockery::mock(\Laravel\Socialite\Two\GoogleProvider::class);
+        $provider->shouldReceive('redirectUrl')->andReturnSelf();
         $provider->shouldReceive('stateless')->once()->andReturnSelf();
         $provider->shouldReceive('user')->once()->andReturn($googleUser);
 
-        Socialite::shouldReceive('driver')
-            ->once()
-            ->with('google')
-            ->andReturn($provider);
+        $managerMock = \Mockery::mock(\Laravel\Socialite\SocialiteManager::class);
+        $managerMock->shouldReceive('driver')->with('google')->andReturn($provider);
+
+        // Swap the Socialite facade root so the controller uses our mock
+        \Laravel\Socialite\Facades\Socialite::swap($managerMock);
 
         $response = $this->get(route('auth.google.callback', [
             'code' => 'fake-code',
@@ -101,6 +104,9 @@ class GoogleAuthFlowTest extends TestCase
         ]));
 
         $user = User::query()->where('email', 'google-new@example.com')->first();
+
+        $this->assertNotNull($user, 'User was not created. Response status: ' . $response->status() . ' Content: ' . substr($response->getContent(), 0, 500));
+
         $analysis = Analysis::query()->where('user_id', $user->id)->latest('id')->first();
 
         $this->assertNotNull($analysis);
